@@ -156,6 +156,30 @@
       .scroll-hint .line {
         height: 20px;
       }
+
+      .cta-grid {
+        gap: 6px !important;
+      }
+      .badges-wrap {
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .badge {
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+      .badge-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        margin-right: 10px;
+      }
+      .badge-content strong {
+        font-size: 11px;
+      }
+      .badge-content span {
+        font-size: 9px;
+      }
     }
 
     /* Parallax Container */
@@ -251,6 +275,75 @@
       /* Darker shadow for visibility */
     }
 
+    /* Badges */
+    .badges-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    
+    .badge {
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top-color: rgba(255, 255, 255, 0.25);
+      border-left-color: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      padding: 12px 16px;
+      text-align: left;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .badge:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    }
+    
+    .badge-icon {
+      margin-right: 14px;
+      background: linear-gradient(135deg, rgba(201, 161, 90, 0.2), rgba(201, 161, 90, 0.05));
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(201, 161, 90, 0.3);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+    
+    .badge-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .badge-content {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .badge-content strong {
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    
+    .badge-content span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
     /* Mobile CTA Buttons (List format) */
     .cta-group {
       display: flex;
@@ -264,25 +357,38 @@
       align-items: center;
       padding: 12px 16px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-top-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       text-decoration: none;
       color: #fff;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       overflow: hidden;
       position: relative;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
     }
 
     .cta:active {
-      transform: scale(0.98);
+      transform: translateY(1px) scale(0.98);
     }
 
     .hero-pink .cta {
-      background: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
       border-color: rgba(255, 255, 255, 0.4);
       box-shadow: 0 4px 15px rgba(230, 138, 160, 0.3);
+    }
+
+    .hero-pink .cta:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+      box-shadow: 0 8px 25px rgba(230, 138, 160, 0.4);
     }
 
     .cta .icon {
@@ -330,6 +436,54 @@
       font-size: 16px;
       font-weight: 500;
       letter-spacing: 0.5px;
+    }
+
+    .cta-main {
+      background: linear-gradient(135deg, rgba(201, 161, 90, 0.25), rgba(201, 161, 90, 0.05)) !important;
+      border-color: rgba(201, 161, 90, 0.4) !important;
+      border-top-color: rgba(201, 161, 90, 0.6) !important;
+      box-shadow: 0 8px 30px rgba(201, 161, 90, 0.25);
+    }
+    
+    .cta-main:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(201, 161, 90, 0.35);
+      background: linear-gradient(135deg, rgba(201, 161, 90, 0.3), rgba(201, 161, 90, 0.1)) !important;
+    }
+
+    .cta-main .btn-title {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .cta-grid .cta {
+      padding: 10px;
+    }
+    
+    .cta-grid .cta .icon {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+    }
+    
+    .cta-grid .cta .icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cta-grid .cta .label {
+      font-size: 9px;
+    }
+
+    .cta-grid .cta .btn-title {
+      font-size: 13px;
     }
 
     /* Scroll Hint */
@@ -430,52 +584,75 @@
         <div class="logo-wrap">
           <img src="IMG_6166.PNG" alt="Fit Wear" />
         </div>
-        <div class="kicker">Fit Wear</div>
-        <h1 class="title">Elegância <em>em movimento</em></h1>
-        <p class="sub">Moda fitness de todos os tipos, peças que acompanham a sua performance com sofisticação.</p>
+        <div class="kicker">Elegance Fitwear</div>
+        <h1 class="title" style="font-size: clamp(26px, 7vw, 38px);">Elegância <em>em movimento</em></h1>
+        
+        <p class="sub" style="margin-bottom: 12px;">Modelagem premium que valoriza seu corpo com conforto e sofisticação.</p>
+
+        <div class="badges-wrap">
+          <div class="badge">
+            <div class="badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <div class="badge-content">
+              <strong>Posicionamento</strong>
+              <span>Peças pensadas para realçar sua beleza em cada treino</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="sub" style="margin-top: 4px; margin-bottom: 16px; font-weight: 400; font-size: 14px; color: #fff;">
+          <strong style="color: var(--gold); font-weight: 600;">Elegância, conforto e performance no seu dia a dia.</strong>
+        </p>
 
         <div class="cta-group">
-          <a class="cta" href="https://api.whatsapp.com/send/?phone=62996226738&text&type=phone_number&app_absent=0"
-            target="_blank">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="#25D366">
-                <path
-                  d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z" />
-              </svg></div>
+          <!-- Main Button -->
+          <a class="cta cta-main" href="https://api.whatsapp.com/send/?phone=62996226738&text=Olá! Quero meu look exclusivo.&type=phone_number&app_absent=0" target="_blank">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="#25D366">
+                <path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z"/>
+              </svg>
+            </div>
             <div class="text-wrap">
-              <span class="label">WhatsApp</span>
-              <span class="btn-title">Fale Agora</span>
+              <span class="label">Atendimento</span>
+              <span class="btn-title">Quero meu look exclusivo</span>
             </div>
           </a>
-          <a class="cta"
-            href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D"
-            target="_blank">
-            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Localização</span>
-              <span class="btn-title">Venha Conhecer</span>
-            </div>
-          </a>
-          <a class="cta" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK" target="_blank">
-            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="8.5" cy="7" r="4" />
-                <path d="M20 8v6M23 11h-6" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Grupo VIP</span>
-              <span class="btn-title">Ofertas Exclusivas</span>
-            </div>
-          </a>
+          
+          <div class="cta-grid">
+            <a class="cta" href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+              <div class="icon">
+                <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <div class="text-wrap">
+                <span class="label">Localização</span>
+                <span class="btn-title">Conhecer a loja</span>
+              </div>
+            </a>
+            
+            <a class="cta" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK" target="_blank">
+              <div class="icon">
+                <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <path d="M20 8v6M23 11h-6" />
+                </svg>
+              </div>
+              <div class="text-wrap">
+                <span class="label">Comunidade</span>
+                <span class="btn-title">Grupo VIP (Ofertas)</span>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
       <div class="scroll-hint">
-        <span>Suplementos Premium</span>
-        <div class="line"></div>
+        <span>Black Fit</span>
       </div>
     </section>
 
@@ -485,35 +662,80 @@
         <div class="logo-wrap">
           <img src="IMG_6165.PNG" alt="Black Fit Suplementos" />
         </div>
-        <div class="kicker">Black Fit</div>
-        <h1 class="title">Força <em>que transforma</em></h1>
-        <p class="sub">Suplementação premium e performance que se sente em cada treino.</p>
+        <div class="kicker">Hidrolândia</div>
+        <h1 class="title" style="font-size: clamp(26px, 7vw, 38px);">Resultados com <em>estratégia certa</em></h1>
+        
+        <div class="badges-wrap">
+          <div class="badge">
+            <div class="badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+                <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+              </svg>
+            </div>
+            <div class="badge-content">
+              <strong>Atendimento Personalizado</strong>
+              <span>De acordo com seu objetivo</span>
+            </div>
+          </div>
+          <div class="badge">
+            <div class="badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="badge-content">
+              <strong>+ <span id="client-counter">0</span> Clientes</strong>
+              <span>Atendidos com resultado em Goiás</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="sub" style="margin-top: 4px; margin-bottom: 16px; font-weight: 400; font-size: 14px; color: #fff;">
+          Aqui você não compra suplemento.<br>
+          <strong style="color: var(--gold); font-weight: 600;">Você segue uma estratégia.</strong>
+        </p>
 
         <div class="cta-group">
-          <a class="cta" href="https://api.whatsapp.com/send/?phone=62995441090&text&type=phone_number&app_absent=0"
+          <!-- Main Button -->
+          <a class="cta cta-main" href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de falar direto com você.&type=phone_number&app_absent=0"
             target="_blank">
             <div class="icon"><svg viewBox="0 0 24 24" fill="#25D366">
                 <path
                   d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z" />
               </svg></div>
             <div class="text-wrap">
-              <span class="label">WhatsApp</span>
-              <span class="btn-title">Fale Agora</span>
+              <span class="label">Atendimento</span>
+              <span class="btn-title">Falar direto comigo</span>
             </div>
           </a>
-          <a class="cta"
-            href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D"
-            target="_blank">
-            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Localização</span>
-              <span class="btn-title">Venha Conhecer</span>
-            </div>
-          </a>
+          
+          <div class="cta-grid">
+            <a class="cta" href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de agendar uma bioimpedância.&type=phone_number&app_absent=0" target="_blank">
+              <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+              <div class="text-wrap">
+                <span class="label">Exame</span>
+                <span class="btn-title">Agendar Bioimpedância</span>
+              </div>
+            </a>
+            <a class="cta"
+              href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D"
+              target="_blank">
+              <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg></div>
+              <div class="text-wrap">
+                <span class="label">Localização</span>
+                <span class="btn-title">Localização da loja</span>
+              </div>
+            </a>
+          </div>
+
           <a class="cta" href="https://chat.whatsapp.com/ITvV0uTMwRK1T08v08XUE8" target="_blank">
             <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -522,8 +744,8 @@
                 <path d="M20 8v6M23 11h-6" />
               </svg></div>
             <div class="text-wrap">
-              <span class="label">Grupo VIP</span>
-              <span class="btn-title">Ofertas Exclusivas</span>
+              <span class="label">Comunidade</span>
+              <span class="btn-title">Grupo VIP (Ofertas exclusivas)</span>
             </div>
           </a>
         </div>
@@ -601,7 +823,7 @@
         scrollProg = 0;
       }
 
-      // Fade pink background out
+      // Fade pink background (inverted: starts at 1, fades to 0)
       bgPink.style.opacity = Math.max(0, 1 - (scrollProg * 1.5));
 
       // Parallax transform and fade out for the first section
@@ -640,6 +862,31 @@
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') });
     }, { threshold: .2 });
     document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+    // Animated Counter
+    const counterEl = document.getElementById('client-counter');
+    if (counterEl) {
+      let animated = false;
+      const counterIo = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !animated) {
+          animated = true;
+          let start = 0;
+          const target = 2500;
+          const duration = 2000;
+          const increment = target / (duration / 16);
+          const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+              clearInterval(timer);
+              counterEl.textContent = target.toLocaleString('pt-BR');
+            } else {
+              counterEl.textContent = Math.floor(start).toLocaleString('pt-BR');
+            }
+          }, 16);
+        }
+      });
+      counterIo.observe(counterEl);
+    }
   </script>
 </body>
 
