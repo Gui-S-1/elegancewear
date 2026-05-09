@@ -49,7 +49,7 @@
       inset: 0;
       z-index: 2;
       background: radial-gradient(circle at 50% 70%, #4a2130 0%, #1c0a11 100%);
-      opacity: 1;
+      opacity: 0;
       /* Will be animated via JS */
       transition: opacity 0.1s linear;
     }
@@ -572,6 +572,46 @@
         transform: translateY(-8px)
       }
     }
+
+    /* Background Man Overlay */
+    .bg-man-overlay {
+      position: absolute;
+      top: 15%;
+      left: 0;
+      width: 100%;
+      height: 85%;
+      background-image: url('bg_man_black.png');
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      z-index: 1;
+      opacity: 0.4;
+      pointer-events: none;
+      mix-blend-mode: lighten;
+      filter: grayscale(100%) contrast(1.1);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+    }
+
+    /* Background Woman Overlay */
+    .bg-woman-overlay {
+      position: absolute;
+      top: 15%;
+      left: 0;
+      width: 100%;
+      height: 85%;
+      background-image: url('bg_woman_black.png');
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      z-index: 1;
+      opacity: 0.4;
+      pointer-events: none;
+      mix-blend-mode: lighten;
+      filter: grayscale(100%) contrast(1.1);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+    }
   </style>
 </head>
 
@@ -583,9 +623,10 @@
   <div class="bg-noise"></div>
 
   <main id="scroll-main">
-    <!-- SECTION 1: FIT WEAR -->
+    <!-- SECTION 2: FIT WEAR -->
     <section class="section hero-pink">
-      <div class="parallax-wrap fade-up">
+      <div class="bg-woman-overlay"></div>
+      <div class="parallax-wrap fade-up" style="transition-delay: 0.2s;">
         <div class="logo-wrap">
           <img src="IMG_6166.PNG" alt="Fit Wear" />
         </div>
@@ -672,9 +713,10 @@
       </div>
     </section>
 
-    <!-- SECTION 2: BLACK FIT -->
+    <!-- SECTION 1: BLACK FIT -->
     <section class="section hero-black">
-      <div class="parallax-wrap fade-up" style="transition-delay: 0.2s;">
+      <div class="bg-man-overlay"></div>
+      <div class="parallax-wrap fade-up">
         <div class="logo-wrap">
           <img src="IMG_6165.PNG" alt="Black Fit Suplementos" />
         </div>
@@ -734,6 +776,18 @@
             </div>
           </a>
 
+          <a class="cta"
+            href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de um atendimento rápido com a Joana.&type=phone_number&app_absent=0"
+            target="_blank">
+            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg></div>
+            <div class="text-wrap">
+              <span class="label">Suporte</span>
+              <span class="btn-title">Atendimento rápido (Joana)</span>
+            </div>
+          </a>
+
           <div class="cta-grid">
             <a class="cta"
               href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de agendar uma bioimpedância.&type=phone_number&app_absent=0"
@@ -775,7 +829,6 @@
             </div>
           </a>
         </div>
-      </div>
     </section>
   </main>
 
@@ -849,7 +902,7 @@
         scrollProg = 0;
       }
 
-      // Fade pink background (inverted: starts at 1, fades to 0)
+      // Fade pink background
       bgPink.style.opacity = Math.max(0, 1 - (scrollProg * 1.5));
 
       // Parallax transform and fade out for the first section
