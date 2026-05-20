@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Black Fit Suplementos × Fit Wear</title>
+  <title>Fit Wear × Black Fit Suplementos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -13,7 +13,10 @@
   <style>
     :root {
       --gold: #c9a15a;
+      --gold-rgb: 201, 161, 90;
       --rose: #e68aa0;
+      --rose-rgb: 230, 138, 160;
+      --bg-dark: #050506;
     }
 
     * {
@@ -24,34 +27,60 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-snap-type: y mandatory;
-      overscroll-behavior: none;
+      scroll-snap-type: y proximity;
+      overscroll-behavior-x: none;
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #000;
+      background: var(--bg-dark);
       color: #fff;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Fixed Backgrounds */
+    /* Fixed Backgrounds with Radial Glows */
     .bg-black {
       position: fixed;
       inset: 0;
       z-index: 1;
-      background: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000 70%);
+      background: radial-gradient(circle at 50% 30%, #1a1612 0%, #050506 75%);
+    }
+    
+    .bg-black::after {
+      content: '';
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(var(--gold-rgb), 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
     }
 
     .bg-pink {
       position: fixed;
       inset: 0;
       z-index: 2;
-      background: radial-gradient(circle at 50% 70%, #4a2130 0%, #1c0a11 100%);
+      background: radial-gradient(circle at 50% 70%, #2f131a 0%, #060204 100%);
       opacity: 0;
-      /* Will be animated via JS */
+      /* Animated via JS scroll listener */
       transition: opacity 0.1s linear;
+    }
+    
+    .bg-pink::after {
+      content: '';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(var(--rose-rgb), 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
     }
 
     #bg-three {
@@ -66,9 +95,94 @@
       inset: 0;
       z-index: 4;
       pointer-events: none;
-      opacity: 0.04;
+      opacity: 0.02;
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>");
+    }
+
+    /* Header Navigation */
+    .header-nav {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 32px);
+      max-width: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 5px;
+      border-radius: 20px;
+      background: rgba(10, 10, 12, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-toggle-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      position: relative;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.55);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 10px 14px;
+      border-radius: 15px;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+
+    .nav-btn.active {
+      color: #fff;
+    }
+
+    .nav-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    /* Active pill indicator background slider */
+    .nav-slider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      border-radius: 15px;
+      z-index: 1;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .theme-black .nav-slider {
+      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.22), rgba(var(--gold-rgb), 0.06));
+      border: 1px solid rgba(var(--gold-rgb), 0.35);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      transform: translateX(100%);
+    }
+
+    .theme-pink .nav-slider {
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.22), rgba(var(--rose-rgb), 0.06));
+      border: 1px solid rgba(var(--rose-rgb), 0.35);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      transform: translateX(0);
     }
 
     /* Main Sections */
@@ -93,29 +207,29 @@
     /* Compact layout for shorter screens so content always fits 100dvh perfectly */
     @media (max-height: 750px) {
       .section {
-        padding: 10px 16px;
+        padding: 12px 16px;
       }
 
       .logo-wrap {
-        width: 120px;
-        height: 120px;
-        margin-bottom: 6px;
-      }
-
-      .hero-pink .logo-wrap {
-        width: 150px;
-        margin-bottom: 10px;
-      }
-
-      h1.title {
-        font-size: 26px;
+        width: 110px;
+        height: 110px;
         margin-bottom: 4px;
       }
 
+      .hero-pink .logo-wrap {
+        width: 140px;
+        margin-bottom: 8px;
+      }
+
+      h1.title {
+        font-size: 24px;
+        margin-bottom: 2px;
+      }
+
       p.sub {
-        font-size: 12px;
-        margin-bottom: 12px;
-        line-height: 1.3;
+        font-size: 11px;
+        margin-bottom: 10px;
+        line-height: 1.25;
         max-width: 100%;
       }
 
@@ -124,37 +238,37 @@
       }
 
       .cta {
-        padding: 8px 12px;
-        border-radius: 10px;
+        padding: 10px 14px;
+        border-radius: 12px;
       }
 
       .cta .icon {
-        width: 32px;
-        height: 32px;
-        margin-right: 10px;
+        width: 30px;
+        height: 30px;
+        margin-right: 8px;
       }
 
       .cta .icon svg {
-        width: 16px;
-        height: 16px;
+        width: 15px;
+        height: 15px;
       }
 
       .cta .label {
-        font-size: 9px;
+        font-size: 8px;
         margin-bottom: 0px;
       }
 
       .cta .btn-title {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       .scroll-hint {
         bottom: 4px;
-        gap: 4px;
+        gap: 2px;
       }
 
       .scroll-hint .line {
-        height: 20px;
+        height: 16px;
       }
 
       .cta-grid {
@@ -162,8 +276,8 @@
       }
 
       .badges-wrap {
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 5px;
+        margin-bottom: 6px;
       }
 
       .badge {
@@ -172,18 +286,22 @@
       }
 
       .badge-icon {
-        width: 30px;
-        height: 30px;
-        font-size: 16px;
-        margin-right: 10px;
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        margin-right: 8px;
       }
 
       .badge-content strong {
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .badge-content span {
-        font-size: 9px;
+        font-size: 8px;
+      }
+      
+      .header-nav {
+        top: 10px;
       }
     }
 
@@ -194,68 +312,69 @@
       align-items: center;
       text-align: center;
       width: 100%;
-      max-width: 480px;
-      /* Mobile focused */
+      max-width: 440px;
       z-index: 10;
     }
 
     /* Typography */
     .kicker {
       font-family: 'Cinzel', serif;
-      font-size: 10px;
-      letter-spacing: 6px;
+      font-size: 9px;
+      letter-spacing: 5px;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
     .hero-pink .kicker {
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.6);
     }
 
     h1.title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(32px, 8vw, 46px);
+      font-size: clamp(28px, 7vw, 42px);
       font-weight: 300;
-      line-height: 1.1;
+      line-height: 1.15;
       margin-bottom: 12px;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
     h1.title em {
       font-style: italic;
       font-weight: 500;
-      background: linear-gradient(180deg, #fff 0%, #888 100%);
+      background: linear-gradient(180deg, #fff 0%, var(--gold) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
 
     .hero-pink h1.title em {
-      background: none;
-      -webkit-background-clip: unset;
-      background-clip: unset;
-      color: var(--gold);
+      background: linear-gradient(180deg, #fff 0%, var(--rose) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     p.sub {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 300;
-      line-height: 1.4;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 20px;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 16px;
       max-width: 90%;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     .hero-pink p.sub {
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.85);
     }
 
     /* Logos */
     .logo-wrap {
-      width: 150px;
-      height: 150px;
-      margin-bottom: 16px;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -263,21 +382,20 @@
     }
 
     .hero-pink .logo-wrap {
-      width: 190px;
+      width: 170px;
       height: auto;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .logo-wrap img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.15));
+      filter: drop-shadow(0 8px 24px rgba(var(--gold-rgb), 0.3));
     }
 
     .hero-pink .logo-wrap img {
-      filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.25));
-      /* Darker shadow for visibility */
+      filter: drop-shadow(0 8px 24px rgba(var(--rose-rgb), 0.3));
     }
 
     /* Badges */
@@ -292,42 +410,58 @@
     .badge {
       display: flex;
       align-items: center;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-top-color: rgba(255, 255, 255, 0.25);
-      border-left-color: rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-top-color: rgba(255, 255, 255, 0.12);
+      border-left-color: rgba(255, 255, 255, 0.12);
       border-radius: 16px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       text-align: left;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
       transform: translateY(0);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .badge:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .badge-icon {
-      margin-right: 14px;
-      background: linear-gradient(135deg, rgba(201, 161, 90, 0.2), rgba(201, 161, 90, 0.05));
-      width: 44px;
-      height: 44px;
+      margin-right: 12px;
+      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.15), rgba(var(--gold-rgb), 0.02));
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      border: 1px solid rgba(201, 161, 90, 0.3);
-      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(var(--gold-rgb), 0.25);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      transition: transform 0.4s ease;
+    }
+
+    .badge:hover .badge-icon {
+      transform: scale(1.08) rotate(8deg);
     }
 
     .badge-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
+      stroke: var(--gold);
+    }
+
+    .hero-pink .badge-icon {
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.15), rgba(var(--rose-rgb), 0.02));
+      border-color: rgba(var(--rose-rgb), 0.3);
+    }
+
+    .hero-pink .badge-icon svg {
+      stroke: var(--rose);
     }
 
     .badge-content {
@@ -336,85 +470,152 @@
     }
 
     .badge-content strong {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--gold);
       font-weight: 600;
       letter-spacing: 0.3px;
     }
 
+    .hero-pink .badge-content strong {
+      color: var(--rose);
+    }
+
     .badge-content span {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.3;
-      margin-top: 2px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.35;
+      margin-top: 1px;
     }
 
     /* Mobile CTA Buttons (List format) */
     .cta-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
     }
 
     .cta {
       display: flex;
       align-items: center;
-      padding: 12px 16px;
+      padding: 13px 16px;
       border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-top-color: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top-color: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       text-decoration: none;
       color: #fff;
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
       position: relative;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Shimmer Effect */
+    .cta::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -150%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.12) 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.12) 70%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      pointer-events: none;
+    }
+
+    /* Periodic Shimmer for Primary CTAs */
+    .cta-main::after {
+      animation: shimmer 6s infinite ease-in-out;
+    }
+
+    /* Sweep on Hover for Other CTAs */
+    .cta:not(.cta-main):hover::after {
+      animation: shimmerHover 1.2s ease-out forwards;
+    }
+
+    @keyframes shimmer {
+      0% {
+        left: -150%;
+      }
+      25% {
+        left: 150%;
+      }
+      100% {
+        left: 150%;
+      }
+    }
+
+    @keyframes shimmerHover {
+      0% {
+        left: -150%;
+      }
+      100% {
+        left: 150%;
+      }
     }
 
     .cta:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+      transform: translateY(-3px) scale(1.015);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .cta:active {
-      transform: translateY(1px) scale(0.98);
+      transform: translateY(0px) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .hero-pink .cta {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-      border-color: rgba(255, 255, 255, 0.4);
-      box-shadow: 0 4px 15px rgba(230, 138, 160, 0.3);
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.08), rgba(var(--rose-rgb), 0.02));
+      border-color: rgba(var(--rose-rgb), 0.2);
+      border-top-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 6px 20px rgba(var(--rose-rgb), 0.05);
     }
 
     .hero-pink .cta:hover {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-      box-shadow: 0 8px 25px rgba(230, 138, 160, 0.4);
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.15), rgba(var(--rose-rgb), 0.04));
+      border-color: rgba(var(--rose-rgb), 0.35);
+      box-shadow: 0 10px 30px rgba(var(--rose-rgb), 0.15);
     }
 
     .cta .icon {
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.07);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-right: 12px;
       flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .cta:hover .icon {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
     }
 
     .hero-pink .cta .icon {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(var(--rose-rgb), 0.15);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .cta .icon svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
     }
 
     .cta .text-wrap {
@@ -424,52 +625,74 @@
     }
 
     .cta .label {
-      font-size: 11px;
+      font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.6);
-      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 2px;
       font-weight: 500;
     }
 
     .hero-pink .cta .label {
-      color: var(--gold);
-      opacity: 1;
+      color: var(--rose);
+      opacity: 0.85;
     }
 
     .cta .btn-title {
-      font-size: 16px;
+      font-size: 14.5px;
       font-weight: 500;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .cta-main {
-      background: linear-gradient(135deg, rgba(201, 161, 90, 0.25), rgba(201, 161, 90, 0.05)) !important;
-      border-color: rgba(201, 161, 90, 0.4) !important;
-      border-top-color: rgba(201, 161, 90, 0.6) !important;
-      box-shadow: 0 8px 30px rgba(201, 161, 90, 0.25);
+      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.22), rgba(var(--gold-rgb), 0.02)) !important;
+      border-color: rgba(var(--gold-rgb), 0.32) !important;
+      border-top-color: rgba(var(--gold-rgb), 0.52) !important;
+      box-shadow: 0 8px 30px rgba(var(--gold-rgb), 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     }
 
     .cta-main:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(201, 161, 90, 0.35);
-      background: linear-gradient(135deg, rgba(201, 161, 90, 0.3), rgba(201, 161, 90, 0.1)) !important;
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(var(--gold-rgb), 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3), rgba(var(--gold-rgb), 0.05)) !important;
+      border-color: rgba(var(--gold-rgb), 0.48) !important;
     }
 
     .cta-main .btn-title {
       color: var(--gold);
       font-weight: 600;
+      text-shadow: 0 0 12px rgba(var(--gold-rgb), 0.3);
+    }
+
+    .hero-pink .cta-main {
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.22), rgba(var(--rose-rgb), 0.02)) !important;
+      border-color: rgba(var(--rose-rgb), 0.38) !important;
+      border-top-color: rgba(255, 255, 255, 0.3) !important;
+      box-shadow: 0 8px 30px rgba(var(--rose-rgb), 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-pink .cta-main:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(var(--rose-rgb), 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.3), rgba(var(--rose-rgb), 0.05)) !important;
+      border-color: rgba(var(--rose-rgb), 0.52) !important;
+    }
+
+    .hero-pink .cta-main .btn-title {
+      color: var(--rose);
+      font-weight: 600;
+      text-shadow: 0 0 12px rgba(var(--rose-rgb), 0.3);
     }
 
     .cta-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
     }
 
     .cta-grid .cta {
-      padding: 10px;
+      padding: 10px 12px;
     }
 
     .cta-grid .cta .icon {
@@ -479,22 +702,79 @@
     }
 
     .cta-grid .cta .icon svg {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
     }
 
     .cta-grid .cta .label {
-      font-size: 9px;
+      font-size: 8px;
     }
 
     .cta-grid .cta .btn-title {
-      font-size: 13px;
+      font-size: 12.5px;
+    }
+
+    /* Status Dot Pulse */
+    .status-dot-pulse {
+      width: 6px;
+      height: 6px;
+      background-color: #25D366;
+      border-radius: 50%;
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+      animation: pulseGreen 1.8s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0% {
+        transform: translateY(-50%) scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6);
+      }
+      70% {
+        transform: translateY(-50%) scale(1);
+        box-shadow: 0 0 0 6px rgba(37, 211, 102, 0);
+      }
+      100% {
+        transform: translateY(-50%) scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+      }
+    }
+
+    /* Evita que o texto encoste ou fique embaixo da badge VIP absoluta */
+    .cta.has-badge, .cta:has(.badge-tag) {
+      padding-right: 64px;
+    }
+
+    /* Badge Tag */
+    .badge-tag {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: rgba(var(--gold-rgb), 0.15);
+      border: 1px solid rgba(var(--gold-rgb), 0.3);
+      color: var(--gold);
+    }
+
+    .hero-pink .badge-tag {
+      background: rgba(var(--rose-rgb), 0.15);
+      border: 1px solid rgba(var(--rose-rgb), 0.3);
+      color: var(--rose);
     }
 
     /* Scroll Hint */
     .scroll-hint {
       position: absolute;
-      bottom: 12px;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -502,35 +782,32 @@
       align-items: center;
       gap: 8px;
       font-family: 'Cinzel', serif;
-      font-size: 9px;
-      letter-spacing: 4px;
-      color: rgba(255, 255, 255, 0.5);
-      animation: bounce 2s infinite;
+      font-size: 8px;
+      letter-spacing: 5px;
+      color: rgba(255, 255, 255, 0.35);
+      animation: bounce 2s infinite ease-in-out;
     }
 
     .scroll-hint .line {
       width: 1px;
-      height: 40px;
-      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.6));
+      height: 30px;
+      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     }
 
     @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translate(-50%, 0)
+      0%, 100% {
+        transform: translate(-50%, 0);
       }
-
       50% {
-        transform: translate(-50%, -10px)
+        transform: translate(-50%, -6px);
       }
     }
 
     /* Animations for load */
     .fade-up {
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s ease-out;
+      transform: translateY(16px);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .fade-up.visible {
@@ -544,87 +821,329 @@
       bottom: 24px;
       right: 24px;
       z-index: 50;
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: #25D366;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-      animation: floatWa 3s infinite ease-in-out;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+      animation: floatWa 3.5s infinite ease-in-out;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .float-wa:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5);
     }
 
     .float-wa svg {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       fill: #fff;
     }
 
     @keyframes floatWa {
-
-      0%,
-      100% {
-        transform: translateY(0)
+      0%, 100% {
+        transform: translateY(0);
       }
-
       50% {
-        transform: translateY(-8px)
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Ken Burns Background Animations */
+    @keyframes kenBurnsMan {
+      0% {
+        transform: scale(1.05) translate(0, 0);
+      }
+      50% {
+        transform: scale(1.18) translate(-1%, -0.5%);
+      }
+      100% {
+        transform: scale(1.05) translate(0, 0);
+      }
+    }
+
+    @keyframes kenBurnsWoman {
+      0% {
+        transform: scale(1.05) translate(0, 0);
+      }
+      50% {
+        transform: scale(1.18) translate(1%, -0.5%);
+      }
+      100% {
+        transform: scale(1.05) translate(0, 0);
       }
     }
 
     /* Background Man Overlay */
     .bg-man-overlay {
       position: absolute;
-      top: 15%;
+      top: 0;
       left: 0;
       width: 100%;
-      height: 85%;
+      height: 100%;
       background-image: url('bg_man_black.png');
       background-size: cover;
-      background-position: center top;
+      background-position: 20% 15%; /* Desloca o homem mais para a lateral */
       background-repeat: no-repeat;
-      z-index: 1;
-      opacity: 0.4;
+      z-index: 2;
+      opacity: 0.85; /* Aumenta a visibilidade */
       pointer-events: none;
-      mix-blend-mode: lighten;
-      filter: grayscale(100%) contrast(1.1);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+      filter: contrast(1.2) brightness(1.15); /* Preserva as cores originais mas melhora o contraste e brilho */
+      mix-blend-mode: screen; /* Remove artefatos de compressão pretos do fundo, fundindo a imagem perfeitamente na página */
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
+      animation: kenBurnsMan 30s infinite ease-in-out;
+      transform-origin: center top;
     }
 
     /* Background Woman Overlay */
     .bg-woman-overlay {
       position: absolute;
-      top: 15%;
+      top: 0;
       left: 0;
       width: 100%;
-      height: 85%;
+      height: 100%;
       background-image: url('bg_woman_black.png');
       background-size: cover;
-      background-position: center top;
+      background-position: 80% 15%; /* Desloca a mulher mais para a lateral */
       background-repeat: no-repeat;
-      z-index: 1;
-      opacity: 0.4;
+      z-index: 2;
+      opacity: 0.85; /* Aumenta a visibilidade */
       pointer-events: none;
-      mix-blend-mode: lighten;
-      filter: grayscale(100%) contrast(1.1);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 50%, transparent 100%);
+      filter: contrast(1.2) brightness(1.15);
+      mix-blend-mode: screen;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
+      animation: kenBurnsWoman 30s infinite ease-in-out;
+      transform-origin: center top;
+    }
+
+    /* Radial backlights to separate hair/body from dark background */
+    .hero-black::before {
+      content: '';
+      position: absolute;
+      top: 14%;
+      left: 76%; /* Deslocado mais para a direita e para o topo para contornar o ombro/cabelo sem iluminar o rosto */
+      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(var(--gold-rgb), 0.3) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-pink::before {
+      content: '';
+      position: absolute;
+      top: 14%;
+      left: 24%; /* Deslocado mais para a esquerda e para o topo */
+      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(var(--rose-rgb), 0.3) 0%, transparent 70%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Ajuste de posição específico para telas maiores (PC) */
+    @media (min-width: 769px) {
+      .bg-man-overlay {
+        background-position: 30% 10%;
+      }
+      .bg-woman-overlay {
+        background-position: 70% 10%;
+      }
+      .hero-black::before {
+        left: 78%;
+        top: 15%;
+      }
+      .hero-pink::before {
+        left: 22%;
+        top: 15%;
+      }
+    }
+
+    /* Layout otimizado para celulares para manter centralizado, estreito e super limpo */
+    @media (max-width: 768px) {
+      .hero-black .parallax-wrap,
+      .hero-pink .parallax-wrap {
+        align-items: center;
+        text-align: center;
+        max-width: 320px; /* Estreita os blocos no celular para liberar as laterais */
+        margin: 0 auto;
+      }
+      .hero-black .badges-wrap,
+      .hero-pink .badges-wrap {
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+      }
+      .hero-black .cta-group,
+      .hero-pink .cta-group {
+        align-items: center;
+        width: 100%;
+        gap: 6px;
+      }
+      .hero-black .cta,
+      .hero-pink .cta {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      
+      /* Resetar alinhamentos e manter padronizado à esquerda internamente nos botões */
+      .hero-pink .cta {
+        flex-direction: row;
+        text-align: left;
+      }
+      .hero-pink .cta .icon {
+        margin-right: 12px;
+        margin-left: 0;
+      }
+      .hero-pink .cta .text-wrap {
+        align-items: flex-start;
+      }
+      .hero-pink .cta.has-badge {
+        padding-right: 64px;
+        padding-left: 12px;
+      }
+      .hero-pink .cta.has-badge .badge-tag {
+        right: 14px;
+        left: auto;
+      }
+      .hero-pink .cta .status-dot-pulse {
+        right: 18px;
+        left: auto;
+      }
+      .hero-pink h1.title {
+        text-align: center;
+      }
+      .hero-pink .badge {
+        flex-direction: row;
+        text-align: left;
+      }
+      .hero-pink .badge-icon {
+        margin-right: 12px;
+        margin-left: 0;
+      }
+      .hero-black h1.title {
+        text-align: center;
+      }
+
+      /* Otimização dos Badges: Esconder subtítulo no mobile para deixá-los de linha única (muito menor) */
+      .badge-content span {
+        display: none !important;
+      }
+      .badge {
+        padding: 8px 12px;
+        border-radius: 12px;
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .badge-icon {
+        width: 26px;
+        height: 26px;
+        margin-right: 10px;
+      }
+      .badge-icon svg {
+        width: 13px;
+        height: 13px;
+      }
+      .badge-content strong {
+        font-size: 11px;
+        line-height: 1.2;
+      }
+
+      /* Reduzir o tamanho geral */
+      .logo-wrap {
+        width: 95px;
+        height: 95px;
+        margin-bottom: 6px;
+      }
+      .hero-pink .logo-wrap {
+        width: 120px;
+        margin-bottom: 6px;
+      }
+      h1.title {
+        font-size: 23px !important;
+        margin-bottom: 4px !important;
+      }
+      p.sub {
+        font-size: 11px !important;
+        margin-bottom: 8px !important;
+      }
+      
+      .cta {
+        padding: 8px 12px;
+        border-radius: 12px;
+      }
+      .cta .icon {
+        width: 26px;
+        height: 26px;
+        margin-right: 10px;
+      }
+      .cta .icon svg {
+        width: 13px;
+        height: 13px;
+      }
+      .cta .btn-title {
+        font-size: 12px;
+      }
+      .cta .label {
+        font-size: 7px;
+      }
+
+      /* Transparência e Blur reduzido para não tapar o rosto dos donos */
+      .badge, .cta {
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        background: rgba(0, 0, 0, 0.38) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+      
+      .hero-pink .cta-main {
+        background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.35), rgba(0, 0, 0, 0.45)) !important;
+        border-color: rgba(var(--rose-rgb), 0.3) !important;
+      }
+      .hero-black .cta-main {
+        background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3), rgba(0, 0, 0, 0.45)) !important;
+        border-color: rgba(var(--gold-rgb), 0.25) !important;
+      }
     }
   </style>
 </head>
-
 <body>
 
   <div class="bg-black"></div>
-  <div class="bg-pink" id="bg-pink"></div>
+  <div class="bg-pink" id="bg-pink" style="opacity: 1;"></div>
   <canvas id="bg-three"></canvas>
   <div class="bg-noise"></div>
 
+  <header class="header-nav theme-pink" id="mainHeader">
+    <div class="nav-toggle-wrap">
+      <div class="nav-slider"></div>
+      <button class="nav-btn" data-target="hero-black" id="btn-suplementos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        Suplementos
+      </button>
+      <button class="nav-btn active" data-target="hero-pink" id="btn-wear">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Fitwear
+      </button>
+    </div>
+  </header>
+
   <main id="scroll-main">
-    <!-- SECTION 2: FIT WEAR -->
-    <section class="section hero-pink">
+    <!-- SECTION 1: FIT WEAR -->
+    <section class="section hero-pink" id="hero-pink">
       <div class="bg-woman-overlay"></div>
       <div class="parallax-wrap fade-up" style="transition-delay: 0.2s;">
         <div class="logo-wrap">
@@ -662,6 +1181,7 @@
           <a class="cta cta-main"
             href="https://api.whatsapp.com/send/?phone=62996226738&text=Olá! Quero meu look exclusivo.&type=phone_number&app_absent=0"
             target="_blank">
+            <span class="status-dot-pulse"></span>
             <div class="icon">
               <svg viewBox="0 0 24 24" fill="#25D366">
                 <path
@@ -691,7 +1211,8 @@
               </div>
             </a>
 
-            <a class="cta" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK?mode=gi_t" target="_blank">
+            <a class="cta has-badge" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK?mode=gi_t" target="_blank">
+              <span class="badge-tag">VIP</span>
               <div class="icon">
                 <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"
                   stroke-linejoin="round">
@@ -709,12 +1230,13 @@
         </div>
       </div>
       <div class="scroll-hint">
-        <span>Black Fit</span>
+        <span>Arraste para cima</span>
+        <div class="line"></div>
       </div>
     </section>
 
-    <!-- SECTION 1: BLACK FIT -->
-    <section class="section hero-black">
+    <!-- SECTION 2: BLACK FIT -->
+    <section class="section hero-black" id="hero-black">
       <div class="bg-man-overlay"></div>
       <div class="parallax-wrap fade-up">
         <div class="logo-wrap">
@@ -766,6 +1288,7 @@
           <a class="cta cta-main"
             href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de falar direto com você.&type=phone_number&app_absent=0"
             target="_blank">
+            <span class="status-dot-pulse"></span>
             <div class="icon"><svg viewBox="0 0 24 24" fill="#25D366">
                 <path
                   d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z" />
@@ -816,7 +1339,8 @@
             </a>
           </div>
 
-          <a class="cta" href="https://chat.whatsapp.com/GxvmQLbBsKxHz90eazilZR?mode=gi_t" target="_blank">
+          <a class="cta has-badge" href="https://chat.whatsapp.com/GxvmQLbBsKxHz90eazilZR?mode=gi_t" target="_blank">
+            <span class="badge-tag">VIP</span>
             <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -829,11 +1353,9 @@
             </div>
           </a>
         </div>
+      </div>
     </section>
   </main>
-
-
-
   <script type="importmap">
 {
   "imports": {
@@ -877,21 +1399,495 @@
       ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     }
+
+    const colorGold = new THREE.Color('#c9a15a');
+    const colorRose = new THREE.Color('#e68aa0');
+
     const mat = new THREE.PointsMaterial({
       size: 0.15, map: makeDot(),
       transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending,
-      color: 0xffffff
+      color: colorRose
     });
     const points = new THREE.Points(geo, mat);
     scene.add(points);
+
+    // Adiciona luzes para dar realismo e brilho aos objetos 3D
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+
+    const pointLight = new THREE.PointLight(0xe68aa0, 2.0, 30);
+    pointLight.position.set(0, 0, 5);
+    scene.add(pointLight);
+
+    // Função para criar haltere 3D de forma procedural
+    function createDumbbell() {
+      const group = new THREE.Group();
+      
+      // Barra central (Metal cromado)
+      const barGeo = new THREE.CylinderGeometry(0.12, 0.12, 1.6, 16);
+      const barMat = new THREE.MeshStandardMaterial({ 
+        color: 0xcccccc, 
+        metalness: 0.95, 
+        roughness: 0.05 
+      });
+      const bar = new THREE.Mesh(barGeo, barMat);
+      bar.rotation.z = Math.PI / 2;
+      group.add(bar);
+      
+      // Discos de peso nas pontas
+      const diskGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.35, 32);
+      const diskMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1f1f1f, 
+        metalness: 0.8, 
+        roughness: 0.35 
+      });
+      
+      const left1 = new THREE.Mesh(diskGeo, diskMat);
+      left1.position.x = -0.55;
+      left1.rotation.z = Math.PI / 2;
+      group.add(left1);
+
+      const left2 = new THREE.Mesh(diskGeo, diskMat);
+      left2.position.x = -0.85;
+      left2.rotation.z = Math.PI / 2;
+      left2.scale.set(0.82, 1, 0.82);
+      group.add(left2);
+      
+      const right1 = new THREE.Mesh(diskGeo, diskMat);
+      right1.position.x = 0.55;
+      right1.rotation.z = Math.PI / 2;
+      group.add(right1);
+
+      const right2 = new THREE.Mesh(diskGeo, diskMat);
+      right2.position.x = 0.85;
+      right2.rotation.z = Math.PI / 2;
+      right2.scale.set(0.82, 1, 0.82);
+      group.add(right2);
+      
+      return group;
+    }
+
+    // Função para criar cápsula de suplemento 3D de forma procedural
+    function createCapsule(capsuleColor) {
+      const group = new THREE.Group();
+      
+      // Metade Superior (colorida)
+      const domeGeo = new THREE.SphereGeometry(0.32, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+      const topMat = new THREE.MeshPhysicalMaterial({ 
+        color: capsuleColor, 
+        metalness: 0.15, 
+        roughness: 0.2,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1
+      });
+      const topDome = new THREE.Mesh(domeGeo, topMat);
+      topDome.position.y = 0.32;
+      group.add(topDome);
+      
+      // Metade Inferior (Branca translúcida)
+      const botMat = new THREE.MeshPhysicalMaterial({ 
+        color: 0xfafafa, 
+        metalness: 0.05, 
+        roughness: 0.25,
+        clearcoat: 0.8
+      });
+      const botDome = new THREE.Mesh(domeGeo, botMat);
+      botDome.position.y = -0.32;
+      botDome.rotation.x = Math.PI;
+      group.add(botDome);
+      
+      // Cilindro do conector do meio
+      const cylGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.64, 32, 1, true);
+      const cyl = new THREE.Mesh(cylGeo, topMat);
+      group.add(cyl);
+      
+      return group;
+    }
+
+    // Função para criar cabide 3D de forma de aramado (Moda Fitness)
+    function createHanger() {
+      const group = new THREE.Group();
+      
+      const metalMat = new THREE.MeshStandardMaterial({ 
+        color: 0xe68aa0, // Rose gold metal
+        metalness: 0.95, 
+        roughness: 0.1 
+      });
+      
+      // Barra horizontal inferior
+      const bottomGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.4, 8);
+      const bottom = new THREE.Mesh(bottomGeo, metalMat);
+      bottom.rotation.z = Math.PI / 2;
+      group.add(bottom);
+      
+      // Haste esquerda inclinada
+      const leftGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.8, 8);
+      const left = new THREE.Mesh(leftGeo, metalMat);
+      left.position.set(-0.35, 0.25, 0);
+      left.rotation.z = -Math.PI / 6;
+      group.add(left);
+      
+      // Haste direita inclinada
+      const right = new THREE.Mesh(leftGeo, metalMat);
+      right.position.set(0.35, 0.25, 0);
+      right.rotation.z = Math.PI / 6;
+      group.add(right);
+      
+      // Gancho superior (curvatura)
+      const hookGeo = new THREE.TorusGeometry(0.2, 0.04, 8, 24, Math.PI * 1.25);
+      const hook = new THREE.Mesh(hookGeo, metalMat);
+      hook.position.set(0, 0.6, 0);
+      hook.rotation.z = -Math.PI / 4.5;
+      group.add(hook);
+      
+      return group;
+    }
+
+    // Função para criar sacola de compras 3D (Moda Fitness)
+    function createShoppingBag() {
+      const group = new THREE.Group();
+      
+      const bagMat = new THREE.MeshPhysicalMaterial({ 
+        color: 0xfdfdfd, 
+        roughness: 0.4,
+        metalness: 0.05,
+        clearcoat: 0.5
+      });
+      
+      // Corpo da Sacola (Caixa retangular fina)
+      const bodyGeo = new THREE.BoxGeometry(1.0, 1.2, 0.4);
+      const body = new THREE.Mesh(bodyGeo, bagMat);
+      group.add(body);
+      
+      // Alças de cordão rose
+      const handleMat = new THREE.MeshStandardMaterial({
+        color: 0xe68aa0,
+        metalness: 0.8,
+        roughness: 0.2
+      });
+      const handleGeo = new THREE.TorusGeometry(0.25, 0.04, 8, 24, Math.PI);
+      
+      const handle1 = new THREE.Mesh(handleGeo, handleMat);
+      handle1.position.set(0, 0.6, 0.1);
+      group.add(handle1);
+
+      const handle2 = new THREE.Mesh(handleGeo, handleMat);
+      handle2.position.set(0, 0.6, -0.1);
+      group.add(handle2);
+      
+      return group;
+    }
+
+    // Geradores de pontos procedurais para os formatos de morphing
+    function generateJarPoints(count) {
+      const pts = [];
+      const bodyCount = Math.floor(count * 0.75);
+      const lidCount = count - bodyCount;
+      for (let i = 0; i < bodyCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = (Math.random() * 2.0) - 1.0;
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? 0.75 : 0.75 * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      for (let i = 0; i < lidCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = 1.0 + (Math.random() * 0.3);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? 0.68 : 0.68 * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      return new Float32Array(pts);
+    }
+
+    function generatePillPoints(count) {
+      const pts = [];
+      const cylCount = Math.floor(count * 0.5);
+      const capCount = Math.floor((count - cylCount) / 2);
+      const capCount2 = count - cylCount - capCount;
+      const R = 0.55;
+      const H = 1.2;
+      for (let i = 0; i < cylCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = (Math.random() * H) - (H / 2);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? R : R * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      for (let i = 0; i < capCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * (Math.PI / 2);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? R : R * Math.sqrt(Math.random());
+        pts.push(
+          r * Math.sin(phi) * Math.cos(theta),
+          (H / 2) + r * Math.cos(phi),
+          r * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+      for (let i = 0; i < capCount2; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * (Math.PI / 2);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? R : R * Math.sqrt(Math.random());
+        pts.push(
+          r * Math.sin(phi) * Math.cos(theta),
+          -(H / 2) - r * Math.cos(phi),
+          r * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+      return new Float32Array(pts);
+    }
+
+    function generateDumbbellPoints(count) {
+      const pts = [];
+      const barCount = Math.floor(count * 0.25);
+      const discCount = Math.floor((count - barCount) / 2);
+      const discCount2 = count - barCount - discCount;
+      for (let i = 0; i < barCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = (Math.random() * 2.2) - 1.1;
+        const r = 0.12 * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      for (let i = 0; i < discCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = 1.1 + (Math.random() * 0.4);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? 0.75 : 0.75 * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      for (let i = 0; i < discCount2; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const y = -1.5 + (Math.random() * 0.4);
+        const isSurface = Math.random() < 0.7;
+        const r = isSurface ? 0.75 : 0.75 * Math.sqrt(Math.random());
+        pts.push(r * Math.cos(theta), y, r * Math.sin(theta));
+      }
+      return new Float32Array(pts);
+    }
+
+    function generateTshirtPoints(count) {
+      const pts = [];
+      const bodyCount = Math.floor(count * 0.6);
+      const sleeveCount = Math.floor((count - bodyCount) / 2);
+      const sleeveCount2 = count - bodyCount - sleeveCount;
+      for (let i = 0; i < bodyCount; i++) {
+        const x = (Math.random() * 1.3) - 0.65;
+        const y = (Math.random() * 1.6) - 1.0;
+        const z = (Math.random() * 0.3) - 0.15;
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < sleeveCount; i++) {
+        const progress = Math.random();
+        const x = -0.65 - progress * 0.5;
+        const y = 0.5 - progress * 0.4 + (Math.random() * 0.3 - 0.15);
+        const z = (Math.random() * 0.3) - 0.15;
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < sleeveCount2; i++) {
+        const progress = Math.random();
+        const x = 0.65 + progress * 0.5;
+        const y = 0.5 - progress * 0.4 + (Math.random() * 0.3 - 0.15);
+        const z = (Math.random() * 0.3) - 0.15;
+        pts.push(x, y, z);
+      }
+      return new Float32Array(pts);
+    }
+
+    function generateHangerPoints(count) {
+      const pts = [];
+      const bottomCount = Math.floor(count * 0.35);
+      const leftCount = Math.floor(count * 0.25);
+      const rightCount = Math.floor(count * 0.25);
+      const hookCount = count - bottomCount - leftCount - rightCount;
+      for (let i = 0; i < bottomCount; i++) {
+        const t = Math.random();
+        const x = -1.1 + t * 2.2;
+        const y = -0.4 + (Math.random() * 0.05 - 0.025);
+        const z = (Math.random() * 0.1) - 0.05;
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < leftCount; i++) {
+        const t = Math.random();
+        const x = -1.1 + t * 1.1;
+        const y = -0.4 + t * 0.8 + (Math.random() * 0.05 - 0.025);
+        const z = (Math.random() * 0.1) - 0.05;
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < rightCount; i++) {
+        const t = Math.random();
+        const x = 1.1 - t * 1.1;
+        const y = -0.4 + t * 0.8 + (Math.random() * 0.05 - 0.025);
+        const z = (Math.random() * 0.1) - 0.05;
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < hookCount; i++) {
+        const alpha = Math.PI * 0.2 + Math.random() * Math.PI * 1.1;
+        const r = 0.25;
+        const x = r * Math.cos(alpha);
+        const y = 0.65 + r * Math.sin(alpha);
+        const z = (Math.random() * 0.08) - 0.04;
+        pts.push(x, y, z);
+      }
+      return new Float32Array(pts);
+    }
+
+    function generateBagPoints(count) {
+      const pts = [];
+      const bodyCount = Math.floor(count * 0.75);
+      const handleCount = count - bodyCount;
+      for (let i = 0; i < bodyCount; i++) {
+        const x = (Math.random() * 1.4) - 0.7;
+        const y = (Math.random() * 1.4) - 0.8;
+        const z = (Math.random() * 0.5) - 0.25;
+        pts.push(x, y, z);
+      }
+      const halfHandle = Math.floor(handleCount / 2);
+      const restHandle = handleCount - halfHandle;
+      for (let i = 0; i < halfHandle; i++) {
+        const alpha = Math.random() * Math.PI;
+        const r = 0.35;
+        const x = r * Math.cos(alpha);
+        const y = 0.6 + r * Math.sin(alpha);
+        const z = 0.15 + (Math.random() * 0.05 - 0.025);
+        pts.push(x, y, z);
+      }
+      for (let i = 0; i < restHandle; i++) {
+        const alpha = Math.random() * Math.PI;
+        const r = 0.35;
+        const x = r * Math.cos(alpha);
+        const y = 0.6 + r * Math.sin(alpha);
+        const z = -0.15 + (Math.random() * 0.05 - 0.025);
+        pts.push(x, y, z);
+      }
+      return new Float32Array(pts);
+    }
+
+    const items = [];
+    
+    // Instanciar pesos 3D e cápsulas na área de Suplementos (Seção 2)
+    const d1 = createDumbbell();
+    d1.position.set(-4.8, 3.2, 2);
+    scene.add(d1);
+    items.push({ mesh: d1, section: 2, speedX: 0.006, speedY: 0.01, rotX: 0.005, rotY: 0.01, basePos: { x: -4.8, y: 3.2, z: 2 } });
+
+    const c1 = createCapsule(0xc9a15a); // Cápsula Dourada
+    c1.position.set(-4.2, 1.2, 3);
+    c1.rotation.set(0.8, 0.4, 0.6);
+    scene.add(c1);
+    items.push({ mesh: c1, section: 2, speedX: 0.01, speedY: 0.009, rotX: 0.015, rotY: 0.008, basePos: { x: -4.2, y: 1.2, z: 3 } });
+
+    // Instanciar cabides e sacolas 3D na área de Fitwear (Seção 1)
+    const hanger = createHanger();
+    hanger.position.set(4.8, 3.2, 2);
+    hanger.rotation.set(0.4, 0.8, 0.1);
+    scene.add(hanger);
+    items.push({ mesh: hanger, section: 1, speedX: 0.005, speedY: 0.008, rotX: -0.008, rotY: 0.006, basePos: { x: 4.8, y: 3.2, z: 2 } });
+
+    const bag = createShoppingBag();
+    bag.position.set(4.2, 1.2, 3);
+    bag.rotation.set(-0.5, 1.2, 0.4);
+    scene.add(bag);
+    items.push({ mesh: bag, section: 1, speedX: 0.008, speedY: 0.012, rotX: 0.01, rotY: 0.018, basePos: { x: 4.2, y: 1.2, z: 3 } });
+
+    // Instanciar os objetos de partículas com Morphing nas áreas vazias
+    const jarTarget = generateJarPoints(1200);
+    const pillTarget = generatePillPoints(1200);
+    const dumbbellTarget = generateDumbbellPoints(1200);
+
+    const morphGeo1 = new THREE.BufferGeometry();
+    morphGeo1.setAttribute('position', new THREE.BufferAttribute(new Float32Array(jarTarget), 3));
+    const morphMat1 = new THREE.PointsMaterial({
+      size: 0.22,
+      map: makeDot(),
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      color: 0xc9a15a
+    });
+    const morphPoints1 = new THREE.Points(morphGeo1, morphMat1);
+    scene.add(morphPoints1);
+    items.push({
+      mesh: morphPoints1,
+      section: 2,
+      speedX: 0.004,
+      speedY: 0.007,
+      rotX: 0.003,
+      rotY: 0.005,
+      basePos: { x: -4.8, y: 2.2, z: 3 },
+      isMorph: true,
+      targets: [jarTarget, pillTarget, dumbbellTarget],
+      activeShapeIndex: 0,
+      changeTimer: 0
+    });
+
+    const tshirtTarget = generateTshirtPoints(1200);
+    const hangerTarget = generateHangerPoints(1200);
+    const bagTarget = generateBagPoints(1200);
+
+    const morphGeo2 = new THREE.BufferGeometry();
+    morphGeo2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(tshirtTarget), 3));
+    const morphMat2 = new THREE.PointsMaterial({
+      size: 0.22,
+      map: makeDot(),
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      color: 0xe68aa0
+    });
+    const morphPoints2 = new THREE.Points(morphGeo2, morphMat2);
+    scene.add(morphPoints2);
+    items.push({
+      mesh: morphPoints2,
+      section: 1,
+      speedX: 0.004,
+      speedY: 0.007,
+      rotX: 0.003,
+      rotY: 0.005,
+      basePos: { x: 4.8, y: 2.2, z: 3 },
+      isMorph: true,
+      targets: [tshirtTarget, hangerTarget, bagTarget],
+      activeShapeIndex: 0,
+      changeTimer: 0
+    });
+
+    // Posicionamento responsivo para funcionar perfeitamente em celulares (traz os objetos para dentro)
+    let screenFactor = window.innerWidth < 768 ? 0.58 : 1.0;
+    function updateItemsX() {
+      screenFactor = window.innerWidth < 768 ? 0.58 : 1.0;
+      items.forEach(item => {
+        item.mesh.position.x = item.basePos.x * screenFactor;
+      });
+    }
+    updateItemsX();
+
+    // Mouse movement interactive particle drift
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    window.addEventListener('pointermove', (e) => {
+      mouseX = (e.clientX - window.innerWidth / 2) / 100;
+      mouseY = (e.clientY - window.innerHeight / 2) / 100;
+    });
 
     // Scroll & Parallax Logic
     const bgPink = document.getElementById('bg-pink');
     const sections = document.querySelectorAll('.parallax-wrap');
 
+    const mainHeader = document.getElementById('mainHeader');
+    const btnSuplementos = document.getElementById('btn-suplementos');
+    const btnWear = document.getElementById('btn-wear');
+
     let scrollProg = 0;
-    window.addEventListener('scroll', () => {
+    function syncScroll() {
       const doc = document.documentElement;
       const scrollTop = window.scrollY || doc.scrollTop;
       const maxScroll = doc.scrollHeight - window.innerHeight;
@@ -902,8 +1898,22 @@
         scrollProg = 0;
       }
 
-      // Fade pink background
-      bgPink.style.opacity = Math.max(0, 1 - (scrollProg * 1.5));
+      // Update floating header theme and active button
+      if (scrollProg < 0.5) {
+        if (mainHeader) {
+          mainHeader.classList.remove('theme-black');
+          mainHeader.classList.add('theme-pink');
+        }
+        if (btnWear) btnWear.classList.add('active');
+        if (btnSuplementos) btnSuplementos.classList.remove('active');
+      } else {
+        if (mainHeader) {
+          mainHeader.classList.remove('theme-pink');
+          mainHeader.classList.add('theme-black');
+        }
+        if (btnWear) btnWear.classList.remove('active');
+        if (btnSuplementos) btnSuplementos.classList.add('active');
+      }
 
       // Parallax transform and fade out for the first section
       if (sections[0]) {
@@ -914,16 +1924,94 @@
       if (sections[1]) {
         sections[1].style.transform = `translateY(0px)`;
       }
-    }, { passive: true });
+    }
+
+    window.addEventListener('scroll', syncScroll, { passive: true });
+    // Sincronizar imediatamente na inicialização para evitar pulos/glitches iniciais
+    window.addEventListener('DOMContentLoaded', syncScroll);
+    syncScroll();
+
+    let lastTime = Date.now();
 
     function animate() {
+      const now = Date.now();
+      const deltaTime = now - lastTime;
+      lastTime = now;
+
+      // Calcular scrollProg em tempo real a cada frame para manter renderização tridimensional livre de stutters/lags
+      const doc = document.documentElement;
+      const scrollTop = window.scrollY || doc.scrollTop;
+      const maxScroll = doc.scrollHeight - window.innerHeight;
+      scrollProg = maxScroll > 0 ? scrollTop / maxScroll : 0;
+
+      // Lerp particle and lighting color em tempo real no frame (Rosa para Ouro no wear.html)
+      mat.color.copy(colorRose).lerp(colorGold, Math.min(1, Math.max(0, scrollProg)));
+      pointLight.color.copy(colorRose).lerp(colorGold, Math.min(1, Math.max(0, scrollProg)));
+
+      // Fade pink background out as we scroll to the black section
+      if (bgPink) {
+        bgPink.style.opacity = Math.min(1, Math.max(0, 1 - scrollProg * 1.5));
+      }
+
       const pos = geo.getAttribute('position');
       for (let i = 0; i < COUNT; i++) {
         pos.array[i * 3 + 1] += speeds[i];
         if (pos.array[i * 3 + 1] > 15) pos.array[i * 3 + 1] = -15;
       }
       pos.needsUpdate = true;
-      points.rotation.y += .0005;
+
+      // Animar os itens flutuantes 3D com efeito suave de ondas e scroll contínuo 1:1
+      const time = now * 0.001;
+      items.forEach(item => {
+        item.mesh.rotation.x += item.rotX * 0.5;
+        item.mesh.rotation.y += item.rotY * 0.5;
+        
+        // Calcular o tamanho do frustum dinâmico com base na profundidade do objeto para scroll 1:1 perfeito
+        const itemZ = item.basePos.z || 2.5;
+        const dist = camera.position.z - itemZ;
+        const frustumHeight = 2 * dist * Math.tan((camera.fov * Math.PI / 180) / 2);
+        
+        const floatY = Math.sin(time * item.speedY * 10) * 0.35;
+        const floatX = Math.cos(time * item.speedX * 10) * 0.25;
+        
+        // Deslocamento vertical 1:1 baseado no scroll da página (sobe junto com o conteúdo)
+        let scrollYOffset = 0;
+        if (item.section === 1) {
+          scrollYOffset = scrollProg * frustumHeight;
+        } else {
+          scrollYOffset = (scrollProg - 1.0) * frustumHeight;
+        }
+        
+        item.mesh.position.y = item.basePos.y + scrollYOffset + floatY;
+        item.mesh.position.x = (item.basePos.x * screenFactor) + floatX;
+        
+        // Garante que o mesh sempre esteja visível pois o scroll cuida de tirá-lo de cena naturalmente
+        item.mesh.visible = true;
+
+        // Se for um sistema de partículas com morphing
+        if (item.isMorph) {
+          item.changeTimer += deltaTime;
+          if (item.changeTimer > 4000) {
+            item.activeShapeIndex = (item.activeShapeIndex + 1) % item.targets.length;
+            item.changeTimer = 0;
+          }
+          
+          const posAttr = item.mesh.geometry.attributes.position;
+          const currentArr = posAttr.array;
+          const targetArr = item.targets[item.activeShapeIndex];
+          
+          for (let i = 0; i < currentArr.length; i++) {
+            currentArr[i] += (targetArr[i] - currentArr[i]) * 0.06;
+          }
+          posAttr.needsUpdate = true;
+        }
+      });
+
+      // Subtle cursor particle parallax drift
+      targetX += (mouseX - targetX) * 0.05;
+      targetY += (mouseY - targetY) * 0.05;
+      points.rotation.x = targetY * 0.1;
+      points.rotation.y = targetX * 0.1 + (Date.now() * 0.00005);
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -934,6 +2022,19 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      updateItemsX();
+    });
+
+    // Navigation button click handlers
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
     });
 
     // Fade Up Observer
