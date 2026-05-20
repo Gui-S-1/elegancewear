@@ -27,6 +27,7 @@
 
     html {
       scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
       overscroll-behavior-x: none;
     }
 
@@ -194,6 +195,7 @@
       height: 100dvh;
       width: 100vw;
       scroll-snap-align: start;
+      scroll-snap-stop: always;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1849,7 +1851,7 @@
       speedY: 0,
       rotX: 0,
       rotY: 0,
-      basePos: { x: 0, y: 0, z: 10 },
+      basePos: { x: 2.7, y: 2.4, z: 8 },
       isMorph: true,
       targets: [tshirtTarget, hangerTarget, bagTarget],
       activeShapeIndex: 0,
@@ -1916,9 +1918,8 @@
 
       // Parallax transform and fade out for the first section
       if (sections[0]) {
-        const clampedTop = Math.max(0, scrollTop);
-        sections[0].style.transform = `translateY(${clampedTop * 0.4}px)`;
-        sections[0].style.opacity = Math.max(0, 1 - (clampedTop / (window.innerHeight * 0.6)));
+        sections[0].style.transform = `translateY(0px)`;
+        sections[0].style.opacity = 1;
       }
       // Removed vertical parallax on the second section so it stays perfectly centered
       if (sections[1]) {
@@ -1976,6 +1977,7 @@
         
         // Deslocamento vertical 1:1 baseado no scroll da página (sobe junto com o conteúdo)
         const clampedProg = Math.min(1, Math.max(0, scrollProg));
+        const sectionVisibility = item.section === 1 ? 1 - clampedProg : clampedProg;
         let scrollYOffset = 0;
         if (item.section === 1) {
           scrollYOffset = clampedProg * frustumHeight;
@@ -1986,8 +1988,7 @@
         item.mesh.position.y = item.basePos.y + scrollYOffset + floatY;
         item.mesh.position.x = (item.basePos.x * screenFactor) + floatX;
         
-        // Garante que o mesh sempre esteja visível pois o scroll cuida de tirá-lo de cena naturalmente
-        item.mesh.visible = true;
+        item.mesh.visible = sectionVisibility > 0.08;
 
         // Se for um sistema de partículas com morphing
         if (item.isMorph) {
