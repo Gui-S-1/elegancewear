@@ -174,14 +174,14 @@
       background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.22), rgba(var(--gold-rgb), 0.06));
       border: 1px solid rgba(var(--gold-rgb), 0.35);
       box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
-      transform: translateX(100%);
+      transform: translateX(0);
     }
 
     .theme-pink .nav-slider {
       background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.22), rgba(var(--rose-rgb), 0.06));
       border: 1px solid rgba(var(--rose-rgb), 0.35);
       box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
-      transform: translateX(0);
+      transform: translateX(100%);
     }
 
     /* Main Sections */
@@ -1786,13 +1786,13 @@
     const hanger = createHanger();
     hanger.position.set(4.8, 3.2, 2);
     hanger.rotation.set(0.4, 0.8, 0.1);
-    scene.add(hanger);
+    // removido da cena — itens sólidos causavam bugs visuais no mobile
     items.push({ mesh: hanger, section: 1, speedX: 0.005, speedY: 0.008, rotX: -0.008, rotY: 0.006, basePos: { x: 4.8, y: 3.2, z: 2 } });
 
     const bag = createShoppingBag();
     bag.position.set(4.2, 1.2, 3);
     bag.rotation.set(-0.5, 1.2, 0.4);
-    scene.add(bag);
+    // removido da cena — itens sólidos causavam bugs visuais no mobile
     items.push({ mesh: bag, section: 1, speedX: 0.008, speedY: 0.012, rotX: 0.01, rotY: 0.018, basePos: { x: 4.2, y: 1.2, z: 3 } });
 
     // Instanciar os objetos de partículas com Morphing nas áreas vazias
@@ -1845,11 +1845,11 @@
     items.push({
       mesh: morphPoints2,
       section: 1,
-      speedX: 0.004,
-      speedY: 0.007,
-      rotX: 0.003,
-      rotY: 0.005,
-      basePos: { x: 4.8, y: 2.2, z: 3 },
+      speedX: 0,
+      speedY: 0,
+      rotX: 0,
+      rotY: 0,
+      basePos: { x: 0, y: 0, z: 10 },
       isMorph: true,
       targets: [tshirtTarget, hangerTarget, bagTarget],
       activeShapeIndex: 0,
