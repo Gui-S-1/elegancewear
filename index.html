@@ -1,1434 +1,212 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-world="pink">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Fit Wear × Black Fit Suplementos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --gold: #c9a15a;
-      --gold-rgb: 201, 161, 90;
-      --rose: #e68aa0;
-      --rose-rgb: 230, 138, 160;
-      --bg-dark: #050506;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-snap-type: y mandatory;
-      overscroll-behavior-x: none;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-dark);
-      color: #fff;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Fixed Backgrounds with Radial Glows */
-    .bg-black {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: radial-gradient(circle at 50% 30%, #1a1612 0%, #050506 75%);
-    }
-    
-    .bg-black::after {
-      content: '';
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(var(--gold-rgb), 0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .bg-pink {
-      position: fixed;
-      inset: 0;
-      z-index: 2;
-      background: radial-gradient(circle at 50% 70%, #2f131a 0%, #060204 100%);
-      opacity: 0;
-      /* Animated via JS scroll listener */
-      transition: opacity 0.1s linear;
-    }
-    
-    .bg-pink::after {
-      content: '';
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(var(--rose-rgb), 0.12) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .bg-noise {
-      position: fixed;
-      inset: 0;
-      z-index: 4;
-      pointer-events: none;
-      opacity: 0.02;
-      mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>");
-    }
-
-    /* Header Navigation */
-    .header-nav {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      width: calc(100% - 32px);
-      max-width: 400px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 5px;
-      border-radius: 20px;
-      background: rgba(10, 10, 12, 0.45);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .nav-toggle-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      width: 100%;
-      position: relative;
-    }
-
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.55);
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      padding: 10px 14px;
-      border-radius: 15px;
-      cursor: pointer;
-      z-index: 2;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-transform: uppercase;
-    }
-
-    .nav-btn.active {
-      color: #fff;
-    }
-
-    .nav-btn svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-    }
-
-    /* Active pill indicator background slider */
-    .nav-slider {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      width: 50%;
-      border-radius: 15px;
-      z-index: 1;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .theme-black .nav-slider {
-      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.22), rgba(var(--gold-rgb), 0.06));
-      border: 1px solid rgba(var(--gold-rgb), 0.35);
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
-      transform: translateX(0);
-    }
-
-    .theme-pink .nav-slider {
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.22), rgba(var(--rose-rgb), 0.06));
-      border: 1px solid rgba(var(--rose-rgb), 0.35);
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
-      transform: translateX(100%);
-    }
-
-    /* Main Sections */
-    main {
-      position: relative;
-      z-index: 5;
-    }
-
-    .section {
-      height: 100dvh;
-      width: 100vw;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Compact layout for shorter screens so content always fits 100dvh perfectly */
-    @media (max-height: 750px) {
-      .section {
-        padding: 12px 16px;
-      }
-
-      .logo-wrap {
-        width: 110px;
-        height: 110px;
-        margin-bottom: 4px;
-      }
-
-      .hero-pink .logo-wrap {
-        width: 140px;
-        margin-bottom: 8px;
-      }
-
-      h1.title {
-        font-size: 24px;
-        margin-bottom: 2px;
-      }
-
-      p.sub {
-        font-size: 11px;
-        margin-bottom: 10px;
-        line-height: 1.25;
-        max-width: 100%;
-      }
-
-      .cta-group {
-        gap: 6px;
-      }
-
-      .cta {
-        padding: 10px 14px;
-        border-radius: 12px;
-      }
-
-      .cta .icon {
-        width: 30px;
-        height: 30px;
-        margin-right: 8px;
-      }
-
-      .cta .icon svg {
-        width: 15px;
-        height: 15px;
-      }
-
-      .cta .label {
-        font-size: 8px;
-        margin-bottom: 0px;
-      }
-
-      .cta .btn-title {
-        font-size: 13px;
-      }
-
-      .scroll-hint {
-        bottom: 4px;
-        gap: 2px;
-      }
-
-      .scroll-hint .line {
-        height: 16px;
-      }
-
-      .cta-grid {
-        gap: 6px !important;
-      }
-
-      .badges-wrap {
-        gap: 5px;
-        margin-bottom: 6px;
-      }
-
-      .badge {
-        padding: 6px 10px;
-        border-radius: 10px;
-      }
-
-      .badge-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 14px;
-        margin-right: 8px;
-      }
-
-      .badge-content strong {
-        font-size: 10px;
-      }
-
-      .badge-content span {
-        font-size: 8px;
-      }
-      
-      .header-nav {
-        top: 10px;
-      }
-    }
-
-    /* Parallax Container */
-    .parallax-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      width: 100%;
-      max-width: 440px;
-      z-index: 10;
-    }
-
-    /* Typography */
-    .kicker {
-      font-family: 'Cinzel', serif;
-      font-size: 9px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.45);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .hero-pink .kicker {
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    h1.title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(28px, 7vw, 42px);
-      font-weight: 300;
-      line-height: 1.15;
-      margin-bottom: 12px;
-      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    h1.title em {
-      font-style: italic;
-      font-weight: 500;
-      background: linear-gradient(180deg, #fff 0%, var(--gold) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-pink h1.title em {
-      background: linear-gradient(180deg, #fff 0%, var(--rose) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    p.sub {
-      font-size: 13.5px;
-      font-weight: 300;
-      line-height: 1.45;
-      color: rgba(255, 255, 255, 0.75);
-      margin-bottom: 16px;
-      max-width: 90%;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .hero-pink p.sub {
-      color: rgba(255, 255, 255, 0.85);
-    }
-
-    /* Logos */
-    .logo-wrap {
-      width: 140px;
-      height: 140px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .hero-pink .logo-wrap {
-      width: 170px;
-      height: auto;
-      margin-bottom: 14px;
-    }
-
-    .logo-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 8px 24px rgba(var(--gold-rgb), 0.3));
-    }
-
-    .hero-pink .logo-wrap img {
-      filter: drop-shadow(0 8px 24px rgba(var(--rose-rgb), 0.3));
-    }
-
-    /* Badges */
-    .badges-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-      width: 100%;
-    }
-
-    .badge {
-      display: flex;
-      align-items: center;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-top-color: rgba(255, 255, 255, 0.12);
-      border-left-color: rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 10px 14px;
-      text-align: left;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      transform: translateY(0);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .badge:hover {
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .badge-icon {
-      margin-right: 12px;
-      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.15), rgba(var(--gold-rgb), 0.02));
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      border: 1px solid rgba(var(--gold-rgb), 0.25);
-      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1);
-      transition: transform 0.4s ease;
-    }
-
-    .badge:hover .badge-icon {
-      transform: scale(1.08) rotate(8deg);
-    }
-
-    .badge-icon svg {
-      width: 18px;
-      height: 18px;
-      stroke: var(--gold);
-    }
-
-    .hero-pink .badge-icon {
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.15), rgba(var(--rose-rgb), 0.02));
-      border-color: rgba(var(--rose-rgb), 0.3);
-    }
-
-    .hero-pink .badge-icon svg {
-      stroke: var(--rose);
-    }
-
-    .badge-content {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .badge-content strong {
-      font-size: 12px;
-      color: var(--gold);
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    .hero-pink .badge-content strong {
-      color: var(--rose);
-    }
-
-    .badge-content span {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.65);
-      line-height: 1.35;
-      margin-top: 1px;
-    }
-
-    /* Mobile CTA Buttons (List format) */
-    .cta-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .cta {
-      display: flex;
-      align-items: center;
-      padding: 13px 16px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-top-color: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      text-decoration: none;
-      color: #fff;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-    }
-
-    /* Shimmer Effect */
-    .cta::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -150%;
-      width: 60%;
-      height: 200%;
-      background: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.12) 30%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0.12) 70%,
-        rgba(255, 255, 255, 0) 100%
-      );
-      transform: rotate(25deg);
-      pointer-events: none;
-    }
-
-    /* Periodic Shimmer for Primary CTAs */
-    .cta-main::after {
-      animation: shimmer 6s infinite ease-in-out;
-    }
-
-    /* Sweep on Hover for Other CTAs */
-    .cta:not(.cta-main):hover::after {
-      animation: shimmerHover 1.2s ease-out forwards;
-    }
-
-    @keyframes shimmer {
-      0% {
-        left: -150%;
-      }
-      25% {
-        left: 150%;
-      }
-      100% {
-        left: 150%;
-      }
-    }
-
-    @keyframes shimmerHover {
-      0% {
-        left: -150%;
-      }
-      100% {
-        left: 150%;
-      }
-    }
-
-    .cta:hover {
-      transform: translateY(-3px) scale(1.015);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .cta:active {
-      transform: translateY(0px) scale(0.98);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    .hero-pink .cta {
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.08), rgba(var(--rose-rgb), 0.02));
-      border-color: rgba(var(--rose-rgb), 0.2);
-      border-top-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 0 6px 20px rgba(var(--rose-rgb), 0.05);
-    }
-
-    .hero-pink .cta:hover {
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.15), rgba(var(--rose-rgb), 0.04));
-      border-color: rgba(var(--rose-rgb), 0.35);
-      box-shadow: 0 10px 30px rgba(var(--rose-rgb), 0.15);
-    }
-
-    .cta .icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.07);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
-      flex-shrink: 0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .cta:hover .icon {
-      background: rgba(255, 255, 255, 0.15);
-      transform: scale(1.05);
-    }
-
-    .hero-pink .cta .icon {
-      background: rgba(var(--rose-rgb), 0.15);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .cta .icon svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .cta .text-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .cta .label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.55);
-      margin-bottom: 2px;
-      font-weight: 500;
-    }
-
-    .hero-pink .cta .label {
-      color: var(--rose);
-      opacity: 0.85;
-    }
-
-    .cta .btn-title {
-      font-size: 14.5px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
-
-    .cta-main {
-      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.22), rgba(var(--gold-rgb), 0.02)) !important;
-      border-color: rgba(var(--gold-rgb), 0.32) !important;
-      border-top-color: rgba(var(--gold-rgb), 0.52) !important;
-      box-shadow: 0 8px 30px rgba(var(--gold-rgb), 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    }
-
-    .cta-main:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(var(--gold-rgb), 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-      background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3), rgba(var(--gold-rgb), 0.05)) !important;
-      border-color: rgba(var(--gold-rgb), 0.48) !important;
-    }
-
-    .cta-main .btn-title {
-      color: var(--gold);
-      font-weight: 600;
-      text-shadow: 0 0 12px rgba(var(--gold-rgb), 0.3);
-    }
-
-    .hero-pink .cta-main {
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.22), rgba(var(--rose-rgb), 0.02)) !important;
-      border-color: rgba(var(--rose-rgb), 0.38) !important;
-      border-top-color: rgba(255, 255, 255, 0.3) !important;
-      box-shadow: 0 8px 30px rgba(var(--rose-rgb), 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    }
-
-    .hero-pink .cta-main:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(var(--rose-rgb), 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-      background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.3), rgba(var(--rose-rgb), 0.05)) !important;
-      border-color: rgba(var(--rose-rgb), 0.52) !important;
-    }
-
-    .hero-pink .cta-main .btn-title {
-      color: var(--rose);
-      font-weight: 600;
-      text-shadow: 0 0 12px rgba(var(--rose-rgb), 0.3);
-    }
-
-    .cta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .cta-grid .cta {
-      padding: 10px 12px;
-    }
-
-    .cta-grid .cta .icon {
-      width: 28px;
-      height: 28px;
-      margin-right: 8px;
-    }
-
-    .cta-grid .cta .icon svg {
-      width: 15px;
-      height: 15px;
-    }
-
-    .cta-grid .cta .label {
-      font-size: 8px;
-    }
-
-    .cta-grid .cta .btn-title {
-      font-size: 12.5px;
-    }
-
-    /* Status Dot Pulse */
-    .status-dot-pulse {
-      width: 6px;
-      height: 6px;
-      background-color: #25D366;
-      border-radius: 50%;
-      position: absolute;
-      right: 18px;
-      top: 50%;
-      transform: translateY(-50%);
-      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
-      animation: pulseGreen 1.8s infinite;
-    }
-
-    @keyframes pulseGreen {
-      0% {
-        transform: translateY(-50%) scale(0.95);
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6);
-      }
-      70% {
-        transform: translateY(-50%) scale(1);
-        box-shadow: 0 0 0 6px rgba(37, 211, 102, 0);
-      }
-      100% {
-        transform: translateY(-50%) scale(0.95);
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-      }
-    }
-
-    /* Evita que o texto encoste ou fique embaixo da badge VIP absoluta */
-    .cta.has-badge, .cta:has(.badge-tag) {
-      padding-right: 64px;
-    }
-
-    /* Badge Tag */
-    .badge-tag {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 3px 6px;
-      border-radius: 6px;
-      background: rgba(var(--gold-rgb), 0.15);
-      border: 1px solid rgba(var(--gold-rgb), 0.3);
-      color: var(--gold);
-    }
-
-    .hero-pink .badge-tag {
-      background: rgba(var(--rose-rgb), 0.15);
-      border: 1px solid rgba(var(--rose-rgb), 0.3);
-      color: var(--rose);
-    }
-
-    /* Scroll Hint */
-    .scroll-hint {
-      position: absolute;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Cinzel', serif;
-      font-size: 8px;
-      letter-spacing: 5px;
-      color: rgba(255, 255, 255, 0.35);
-      animation: bounce 2s infinite ease-in-out;
-    }
-
-    .scroll-hint .line {
-      width: 1px;
-      height: 30px;
-      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    }
-
-    @keyframes bounce {
-      0%, 100% {
-        transform: translate(-50%, 0);
-      }
-      50% {
-        transform: translate(-50%, -6px);
-      }
-    }
-
-    /* Animations for load */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(16px);
-      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Floating WhatsApp */
-    .float-wa {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 50;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: #25D366;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
-      animation: floatWa 3.5s infinite ease-in-out;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: all 0.3s ease;
-    }
-
-    .float-wa:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5);
-    }
-
-    .float-wa svg {
-      width: 24px;
-      height: 24px;
-      fill: #fff;
-    }
-
-    @keyframes floatWa {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-6px);
-      }
-    }
-
-    /* Ken Burns Background Animations */
-    @keyframes kenBurnsMan {
-      0% {
-        transform: scale(1.05) translate(0, 0);
-      }
-      50% {
-        transform: scale(1.18) translate(-1%, -0.5%);
-      }
-      100% {
-        transform: scale(1.05) translate(0, 0);
-      }
-    }
-
-    @keyframes kenBurnsWoman {
-      0% {
-        transform: scale(1.05) translate(0, 0);
-      }
-      50% {
-        transform: scale(1.18) translate(1%, -0.5%);
-      }
-      100% {
-        transform: scale(1.05) translate(0, 0);
-      }
-    }
-
-    /* Background Man Overlay */
-    .bg-man-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('bg_man_black.png');
-      background-size: cover;
-      background-position: 20% 15%; /* Desloca o homem mais para a lateral */
-      background-repeat: no-repeat;
-      z-index: 2;
-      opacity: 0.85; /* Aumenta a visibilidade */
-      pointer-events: none;
-      filter: contrast(1.2) brightness(1.15); /* Preserva as cores originais mas melhora o contraste e brilho */
-      mix-blend-mode: screen; /* Remove artefatos de compressão pretos do fundo, fundindo a imagem perfeitamente na página */
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
-      animation: kenBurnsMan 30s infinite ease-in-out;
-      transform-origin: center top;
-    }
-
-    /* Background Woman Overlay */
-    .bg-woman-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('bg_woman_black.png');
-      background-size: cover;
-      background-position: 80% 15%; /* Desloca a mulher mais para a lateral */
-      background-repeat: no-repeat;
-      z-index: 2;
-      opacity: 0.85; /* Aumenta a visibilidade */
-      pointer-events: none;
-      filter: contrast(1.2) brightness(1.15);
-      mix-blend-mode: screen;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 80%, transparent 100%);
-      animation: kenBurnsWoman 30s infinite ease-in-out;
-      transform-origin: center top;
-    }
-
-    /* Radial backlights to separate hair/body from dark background */
-    .hero-black::before {
-      content: '';
-      position: absolute;
-      top: 14%;
-      left: 76%; /* Deslocado mais para a direita e para o topo para contornar o ombro/cabelo sem iluminar o rosto */
-      transform: translate(-50%, -50%);
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(var(--gold-rgb), 0.3) 0%, transparent 70%);
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .hero-pink::before {
-      content: '';
-      position: absolute;
-      top: 14%;
-      left: 24%; /* Deslocado mais para a esquerda e para o topo */
-      transform: translate(-50%, -50%);
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(var(--rose-rgb), 0.3) 0%, transparent 70%);
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Ajuste de posição específico para telas maiores (PC) */
-    @media (min-width: 769px) {
-      .bg-man-overlay {
-        background-position: 30% 10%;
-      }
-      .bg-woman-overlay {
-        background-position: 70% 10%;
-      }
-      .hero-black::before {
-        left: 78%;
-        top: 15%;
-      }
-      .hero-pink::before {
-        left: 22%;
-        top: 15%;
-      }
-    }
-
-    /* Layout otimizado para celulares para manter centralizado, estreito e super limpo */
-    @media (max-width: 768px) {
-      .hero-black .parallax-wrap,
-      .hero-pink .parallax-wrap {
-        align-items: center;
-        text-align: center;
-        max-width: 320px; /* Estreita os blocos no celular para liberar as laterais */
-        margin: 0 auto;
-      }
-      .hero-black .badges-wrap,
-      .hero-pink .badges-wrap {
-        align-items: center;
-        gap: 6px;
-        width: 100%;
-      }
-      .hero-black .cta-group,
-      .hero-pink .cta-group {
-        align-items: center;
-        width: 100%;
-        gap: 6px;
-      }
-      .hero-black .cta,
-      .hero-pink .cta {
-        width: 100%;
-        justify-content: flex-start;
-      }
-      
-      /* Resetar alinhamentos e manter padronizado à esquerda internamente nos botões */
-      .hero-pink .cta {
-        flex-direction: row;
-        text-align: left;
-      }
-      .hero-pink .cta .icon {
-        margin-right: 12px;
-        margin-left: 0;
-      }
-      .hero-pink .cta .text-wrap {
-        align-items: flex-start;
-      }
-      .hero-pink .cta.has-badge {
-        padding-right: 64px;
-        padding-left: 12px;
-      }
-      .hero-pink .cta.has-badge .badge-tag {
-        right: 14px;
-        left: auto;
-      }
-      .hero-pink .cta .status-dot-pulse {
-        right: 18px;
-        left: auto;
-      }
-      .hero-pink h1.title {
-        text-align: center;
-      }
-      .hero-pink .badge {
-        flex-direction: row;
-        text-align: left;
-      }
-      .hero-pink .badge-icon {
-        margin-right: 12px;
-        margin-left: 0;
-      }
-      .hero-black h1.title {
-        text-align: center;
-      }
-
-      /* Otimização dos Badges: Esconder subtítulo no mobile para deixá-los de linha única (muito menor) */
-      .badge-content span {
-        display: none !important;
-      }
-      .badge {
-        padding: 8px 12px;
-        border-radius: 12px;
-        width: 100%;
-        justify-content: flex-start;
-      }
-      .badge-icon {
-        width: 26px;
-        height: 26px;
-        margin-right: 10px;
-      }
-      .badge-icon svg {
-        width: 13px;
-        height: 13px;
-      }
-      .badge-content strong {
-        font-size: 11px;
-        line-height: 1.2;
-      }
-
-      /* Reduzir o tamanho geral */
-      .logo-wrap {
-        width: 95px;
-        height: 95px;
-        margin-bottom: 6px;
-      }
-      .hero-pink .logo-wrap {
-        width: 120px;
-        margin-bottom: 6px;
-      }
-      h1.title {
-        font-size: 23px !important;
-        margin-bottom: 4px !important;
-      }
-      p.sub {
-        font-size: 11px !important;
-        margin-bottom: 8px !important;
-      }
-      
-      .cta {
-        padding: 8px 12px;
-        border-radius: 12px;
-      }
-      .cta .icon {
-        width: 26px;
-        height: 26px;
-        margin-right: 10px;
-      }
-      .cta .icon svg {
-        width: 13px;
-        height: 13px;
-      }
-      .cta .btn-title {
-        font-size: 12px;
-      }
-      .cta .label {
-        font-size: 7px;
-      }
-
-      /* Transparência e Blur reduzido para não tapar o rosto dos donos */
-      .badge, .cta {
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-        background: rgba(0, 0, 0, 0.38) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-      }
-      
-      .hero-pink .cta-main {
-        background: linear-gradient(135deg, rgba(var(--rose-rgb), 0.35), rgba(0, 0, 0, 0.45)) !important;
-        border-color: rgba(var(--rose-rgb), 0.3) !important;
-      }
-      .hero-black .cta-main {
-        background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3), rgba(0, 0, 0, 0.45)) !important;
-        border-color: rgba(var(--gold-rgb), 0.25) !important;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Elegance Fitwear × Black Fit Suplementos</title>
+  <meta name="description" content="Elegance Fitwear e Black Fit Suplementos em Hidrolândia (GO). Moda fitness premium, suplementação com estratégia e bioimpedância." />
+  <meta name="theme-color" content="#14060c" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Elegance Fitwear × Black Fit Suplementos" />
+  <meta property="og:description" content="Duas lojas, um endereço em Hidrolândia (GO). Fale com a gente pelo WhatsApp." />
+  <link rel="icon" type="image/png" href="assets/img/elegance-icon.png" />
+  <link rel="apple-touch-icon" href="assets/img/elegance-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="assets/img/owner-elegance.webp" />
+  <link rel="preload" as="image" href="assets/img/owner-blackfit.webp" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <noscript>
+    <style>
+      html, body { overflow: auto !important; height: auto !important; }
+      .panels, .panel { position: relative !important; inset: auto !important; visibility: visible !important; }
+      .panel-inner { min-height: 100vh; }
+      .rv { opacity: 1 !important; }
+      .intro, .fx { display: none !important; }
+    </style>
+  </noscript>
 </head>
+
 <body>
+  <!-- Ícones -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-vip" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M11 3.5 12.9 9l5.6 2-5.6 2L11 18.5 9.1 13l-5.6-2 5.6-2L11 3.5z"/><path d="M19 3v4M17 5h4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  </svg>
 
-  <div class="bg-black"></div>
-  <div class="bg-pink" id="bg-pink" style="opacity: 1;"></div>
-  <div class="bg-noise"></div>
-
-  <header class="header-nav theme-pink" id="mainHeader">
-    <div class="nav-toggle-wrap">
-      <div class="nav-slider"></div>
-      <button class="nav-btn" data-target="hero-black" id="btn-suplementos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-        Suplementos
-      </button>
-      <button class="nav-btn active" data-target="hero-pink" id="btn-wear">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-        Fitwear
-      </button>
+  <!-- Palco: fundos, fotos e camada de efeitos (canvas ASCII / maré líquida) -->
+  <div class="stage" aria-hidden="true">
+    <div class="world world--pink" data-key="pink">
+      <div class="world-bg"></div>
+      <div class="aurora"><i></i><i></i><i></i></div>
+      <canvas class="fluid"></canvas>
+      <div class="owner-wrap">
+        <img class="owner" src="assets/img/owner-elegance.webp" alt="" width="1024" height="1024" decoding="async" />
+      </div>
     </div>
+    <div class="world world--black" data-key="black">
+      <div class="world-bg"></div>
+      <div class="aurora"><i></i><i></i><i></i></div>
+      <canvas class="fluid"></canvas>
+      <div class="owner-wrap">
+        <img class="owner" src="assets/img/owner-blackfit.webp" alt="" width="1024" height="1024" decoding="async" />
+      </div>
+    </div>
+    <canvas class="fx" id="fx"></canvas>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Seletor de loja (liquid glass) -->
+  <header class="topbar">
+    <nav class="switch glass" aria-label="Escolha a loja">
+      <span class="switch-pill" aria-hidden="true"><span class="pill pill--rose"></span><span class="pill pill--gold"></span></span>
+      <button class="switch-btn" type="button" data-go="0" aria-controls="elegance" aria-pressed="true">
+        <svg class="i"><use href="#i-sparkle" /></svg><span>Elegance</span>
+      </button>
+      <button class="switch-btn" type="button" data-go="1" aria-controls="blackfit" aria-pressed="false">
+        <svg class="i"><use href="#i-dumbbell" /></svg><span>Black Fit</span>
+      </button>
+    </nav>
   </header>
 
-  <main id="scroll-main">
-    <!-- SECTION 1: FIT WEAR -->
-    <section class="section hero-pink" id="hero-pink">
-      <div class="bg-woman-overlay"></div>
-      <div class="parallax-wrap fade-up" style="transition-delay: 0.2s;">
-        <div class="logo-wrap">
-          <img src="IMG_6166.PNG" alt="Fit Wear" />
-        </div>
-        <div class="kicker">Elegance Fitwear</div>
-        <h1 class="title" style="font-size: clamp(26px, 7vw, 38px);">Elegância <em>em movimento</em></h1>
-
-        <p class="sub" style="margin-bottom: 12px;">Modelagem premium que valoriza seu corpo com conforto e
-          sofisticação.</p>
-
-        <div class="badges-wrap">
-          <div class="badge">
-            <div class="badge-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path
-                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            </div>
-            <div class="badge-content">
-              <strong>Posicionamento</strong>
-              <span>Peças pensadas para realçar sua beleza em cada treino</span>
-            </div>
+  <main class="panels">
+    <!-- ===================== ELEGANCE FITWEAR ===================== -->
+    <section class="panel panel--pink" id="elegance" aria-label="Elegance Fitwear" data-hash="elegance fitwear rosa">
+      <div class="panel-inner">
+        <div class="brand brand--pink rv" data-hook="scramble">
+          <div class="wordmark">
+            <img src="assets/img/elegance-wordmark.webp" alt="Elegance Fitwear" width="922" height="275" data-intro="pixel" data-intro-label="Elegance · Fitwear" />
+            <span class="wordmark-shine" aria-hidden="true"></span>
           </div>
+          <p class="kicker" data-scramble>Moda fitness · Hidrolândia</p>
         </div>
 
-        <p class="sub" style="margin-top: 4px; margin-bottom: 16px; font-weight: 400; font-size: 14px; color: #fff;">
-          <strong style="color: var(--gold); font-weight: 600;">Elegância, conforto e performance no seu dia a
-            dia.</strong>
-        </p>
+        <h1 class="title rv" data-hook="words">Elegância <em>em movimento</em></h1>
 
-        <div class="cta-group">
-          <!-- Main Button -->
-          <a class="cta cta-main"
-            href="https://api.whatsapp.com/send/?phone=62996226738&text=Olá! Quero meu look exclusivo.&type=phone_number&app_absent=0"
-            target="_blank">
-            <span class="status-dot-pulse"></span>
-            <div class="icon">
-              <svg viewBox="0 0 24 24" fill="#25D366">
-                <path
-                  d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z" />
-              </svg>
-            </div>
-            <div class="text-wrap">
-              <span class="label">Atendimento</span>
-              <span class="btn-title">Quero meu look exclusivo</span>
-            </div>
+        <p class="sub rv">Modelagem premium que valoriza seu corpo com conforto e sofisticação.</p>
+
+        <div class="feature glass rv">
+          <span class="stat-ico"><svg class="i"><use href="#i-star" /></svg></span>
+          <p><strong>Posicionamento</strong><span>Peças pensadas para realçar sua beleza em cada treino</span></p>
+        </div>
+
+        <p class="quote rv"><strong>Elegância, conforto e performance</strong> no seu dia a dia.</p>
+
+        <a class="cta cta--main glass rv" href="https://wa.me/5562996226738?text=Ol%C3%A1%21%20Quero%20meu%20look%20exclusivo." target="_blank" rel="noopener">
+          <span class="liquid" aria-hidden="true"><i></i><i></i></span>
+          <span class="ico ico--wa"><svg class="i i-fill"><use href="#i-wa" /></svg></span>
+          <span class="txt"><span class="lbl">Atendimento · online</span><span class="ttl">Quero meu look exclusivo</span></span>
+          <span class="dot" aria-hidden="true"></span>
+        </a>
+
+        <div class="tiles tiles--2">
+          <a class="tile glass rv" href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&amp;g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+            <span class="ico"><svg class="i"><use href="#i-pin" /></svg></span>
+            <span class="txt"><span class="lbl">Loja</span><span class="ttl">Conhecer a loja</span></span>
           </a>
-
-          <div class="cta-grid">
-            <a class="cta"
-              href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D"
-              target="_blank">
-              <div class="icon">
-                <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
-              <div class="text-wrap">
-                <span class="label">Localização</span>
-                <span class="btn-title">Conhecer a loja</span>
-              </div>
-            </a>
-
-            <a class="cta has-badge" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK?mode=gi_t" target="_blank">
-              <span class="badge-tag">VIP</span>
-              <div class="icon">
-                <svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <path d="M20 8v6M23 11h-6" />
-                </svg>
-              </div>
-              <div class="text-wrap">
-                <span class="label">Comunidade</span>
-                <span class="btn-title">Grupo VIP (Ofertas)</span>
-              </div>
-            </a>
-          </div>
+          <a class="tile glass rv" href="https://chat.whatsapp.com/B864ooWxaIICeBSbVhy1RK?mode=gi_t" target="_blank" rel="noopener">
+            <span class="tag">VIP</span>
+            <span class="ico"><svg class="i"><use href="#i-vip" /></svg></span>
+            <span class="txt"><span class="lbl">Ofertas</span><span class="ttl">Grupo VIP</span></span>
+          </a>
         </div>
-      </div>
-      <div class="scroll-hint">
-        <span>Arraste para cima</span>
-        <div class="line"></div>
+
+        <button class="hint rv" type="button" data-go="1">
+          <span class="hint-lbl" data-scramble>Black Fit Suplementos</span>
+          <svg class="i" aria-hidden="true"><use href="#i-down" /></svg>
+        </button>
       </div>
     </section>
 
-    <!-- SECTION 2: BLACK FIT -->
-    <section class="section hero-black" id="hero-black">
-      <div class="bg-man-overlay"></div>
-      <div class="parallax-wrap fade-up">
-        <div class="logo-wrap">
-          <img src="IMG_6165.PNG" alt="Black Fit Suplementos" />
-        </div>
-        <div class="kicker">Hidrolândia</div>
-        <h1 class="title" style="font-size: clamp(26px, 7vw, 38px);">Resultados com <em>estratégia certa</em></h1>
-
-        <div class="badges-wrap">
-          <div class="badge">
-            <div class="badge-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path
-                  d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
-                <path
-                  d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
-              </svg>
-            </div>
-            <div class="badge-content">
-              <strong>Atendimento Personalizado</strong>
-              <span>De acordo com seu objetivo</span>
-            </div>
+    <!-- ===================== BLACK FIT SUPLEMENTOS ===================== -->
+    <section class="panel panel--black" id="blackfit" aria-label="Black Fit Suplementos" data-hash="blackfit suplementos">
+      <div class="panel-inner">
+        <div class="brand rv" data-hook="scramble">
+          <div class="emblem">
+            <span class="emblem-ring" aria-hidden="true"></span>
+            <img src="assets/img/blackfit-emblem.webp" alt="Black Fit Suplementos" width="320" height="320" data-intro="tint" data-intro-label="Black Fit · Suplementos" />
           </div>
-          <div class="badge">
-            <div class="badge-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <div class="badge-content">
-              <strong>+ <span id="client-counter">0</span> Clientes</strong>
-              <span>Atendidos com resultado em Goiás</span>
-            </div>
+          <div class="brand-text">
+            <p class="kicker" data-scramble>Hidrolândia · GO</p>
+            <p class="brand-name">Black Fit Suplementos</p>
           </div>
         </div>
 
-        <p class="sub" style="margin-top: 4px; margin-bottom: 16px; font-weight: 400; font-size: 14px; color: #fff;">
-          Aqui você não compra suplemento.<br>
-          <strong style="color: var(--gold); font-weight: 600;">Você segue uma estratégia.</strong>
-        </p>
+        <h2 class="title rv" data-hook="words">Resultados com <em>estratégia certa</em></h2>
 
-        <div class="cta-group">
-          <!-- Main Button -->
-          <a class="cta cta-main"
-            href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de falar direto com você.&type=phone_number&app_absent=0"
-            target="_blank">
-            <span class="status-dot-pulse"></span>
-            <div class="icon"><svg viewBox="0 0 24 24" fill="#25D366">
-                <path
-                  d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.8 0-3.6-.5-5.2-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 0 1 2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm5.5-7.5c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-1 1.2-.2.1-.3.2-.6 0-.3-.1-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.7-1.8c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.9 2.3 1 2.5c.1.2 1.8 2.8 4.4 3.9 2.6 1 2.6.7 3.1.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.4-.2z" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Atendimento</span>
-              <span class="btn-title">Falar direto comigo</span>
-            </div>
-          </a>
-
-          <a class="cta"
-            href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de um atendimento rápido com a Joana.&type=phone_number&app_absent=0"
-            target="_blank">
-            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Suporte</span>
-              <span class="btn-title">Atendimento rápido (Joana)</span>
-            </div>
-          </a>
-
-          <div class="cta-grid">
-            <a class="cta"
-              href="https://api.whatsapp.com/send/?phone=62995441090&text=Olá! Gostaria de agendar uma bioimpedância.&type=phone_number&app_absent=0"
-              target="_blank">
-              <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                </svg></div>
-              <div class="text-wrap">
-                <span class="label">Exame</span>
-                <span class="btn-title">Agendar Bioimpedância</span>
-              </div>
-            </a>
-            <a class="cta"
-              href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D"
-              target="_blank">
-              <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg></div>
-              <div class="text-wrap">
-                <span class="label">Localização</span>
-                <span class="btn-title">Localização da loja</span>
-              </div>
-            </a>
+        <div class="stats glass rv" data-hook="count">
+          <div class="stat">
+            <span class="stat-ico"><svg class="i"><use href="#i-target" /></svg></span>
+            <p><strong>Atendimento personalizado</strong><span>De acordo com seu objetivo</span></p>
           </div>
+          <div class="stat stat--num">
+            <p><strong class="big">+<b class="count" data-to="2500">2.500</b></strong><span>clientes com resultado em Goiás</span></p>
+          </div>
+        </div>
 
-          <a class="cta has-badge" href="https://chat.whatsapp.com/GxvmQLbBsKxHz90eazilZR?mode=gi_t" target="_blank">
-            <span class="badge-tag">VIP</span>
-            <div class="icon"><svg viewBox="0 0 24 24" stroke="#fff" fill="none" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="8.5" cy="7" r="4" />
-                <path d="M20 8v6M23 11h-6" />
-              </svg></div>
-            <div class="text-wrap">
-              <span class="label">Comunidade</span>
-              <span class="btn-title">Grupo VIP (Ofertas exclusivas)</span>
-            </div>
+        <p class="quote rv">Aqui você não compra suplemento.<br /><strong>Você segue uma estratégia.</strong></p>
+
+        <a class="cta cta--main glass rv" href="https://wa.me/5562995441090?text=Ol%C3%A1%21%20Gostaria%20de%20falar%20direto%20com%20voc%C3%AA." target="_blank" rel="noopener">
+          <span class="liquid" aria-hidden="true"><i></i><i></i></span>
+          <span class="ico ico--wa"><svg class="i i-fill"><use href="#i-wa" /></svg></span>
+          <span class="txt"><span class="lbl">Atendimento · online</span><span class="ttl">Falar direto comigo</span></span>
+          <span class="dot" aria-hidden="true"></span>
+        </a>
+
+        <a class="cta glass rv" href="https://wa.me/5562995441090?text=Ol%C3%A1%21%20Gostaria%20de%20um%20atendimento%20r%C3%A1pido%20com%20a%20Joana." target="_blank" rel="noopener">
+          <span class="ico"><svg class="i"><use href="#i-bolt" /></svg></span>
+          <span class="txt"><span class="lbl">Suporte</span><span class="ttl">Atendimento rápido com a Joana</span></span>
+          <svg class="i go" aria-hidden="true"><use href="#i-arrow" /></svg>
+        </a>
+
+        <div class="tiles tiles--3">
+          <a class="tile glass rv" href="https://wa.me/5562995441090?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20bioimped%C3%A2ncia." target="_blank" rel="noopener">
+            <span class="ico"><svg class="i"><use href="#i-pulse" /></svg></span>
+            <span class="txt"><span class="lbl">Exame</span><span class="ttl">Bioimpedância</span></span>
+          </a>
+          <a class="tile glass rv" href="https://www.google.com/maps/place/Black+Fit+Suplementos/@-16.9672701,-49.2284504,19z/data=!3m1!4b1!4m12!1m5!3m4!2zMTbCsDU4JzAyLjIiUyA0OcKwMTMnNDAuMiJX!8m2!3d-16.9672778!4d-49.2278333!3m5!1s0x935f036468882fff:0xd0c602d6ff59555c!8m2!3d-16.9672714!4d-49.2278067!16s%2Fg%2F11myf7r55s?entry=ttu&amp;g_ep=EgoyMDI2MDQyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+            <span class="ico"><svg class="i"><use href="#i-pin" /></svg></span>
+            <span class="txt"><span class="lbl">Loja</span><span class="ttl">Como chegar</span></span>
+          </a>
+          <a class="tile glass rv" href="https://chat.whatsapp.com/GxvmQLbBsKxHz90eazilZR?mode=gi_t" target="_blank" rel="noopener">
+            <span class="tag">VIP</span>
+            <span class="ico"><svg class="i"><use href="#i-vip" /></svg></span>
+            <span class="txt"><span class="lbl">Ofertas</span><span class="ttl">Grupo VIP</span></span>
           </a>
         </div>
+
+        <button class="hint rv" type="button" data-go="0">
+          <svg class="i" aria-hidden="true"><use href="#i-up" /></svg>
+          <span class="hint-lbl" data-scramble>Elegance Fitwear</span>
+        </button>
       </div>
     </section>
   </main>
-  <script>
-    const bgPink = document.getElementById('bg-pink');
-    const mainHeader = document.getElementById('mainHeader');
-    const btnSuplementos = document.getElementById('btn-suplementos');
-    const btnWear = document.getElementById('btn-wear');
-    const sections = Array.from(document.querySelectorAll('.section'));
-    const firstSectionIsPink = sections[0]?.classList.contains('hero-pink');
 
-    function clamp(value, min, max) {
-      return Math.min(max, Math.max(min, value));
-    }
+  <p class="sr-only" id="live" aria-live="polite"></p>
 
-    function syncScroll() {
-      const doc = document.documentElement;
-      const maxScroll = doc.scrollHeight - window.innerHeight;
-      const scrollTop = Math.max(0, window.scrollY || doc.scrollTop);
-      const scrollProg = maxScroll > 0 ? clamp(scrollTop / maxScroll, 0, 1) : 0;
-      const viewportMid = scrollTop + window.innerHeight / 2;
-      const activeSection = sections.reduce((current, section) => {
-        const sectionMid = section.offsetTop + section.offsetHeight / 2;
-        const currentMid = current.offsetTop + current.offsetHeight / 2;
-        return Math.abs(sectionMid - viewportMid) < Math.abs(currentMid - viewportMid) ? section : current;
-      }, sections[0]);
-      const isPink = activeSection?.classList.contains('hero-pink');
+  <!-- Intro ASCII -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <canvas class="intro-art"></canvas>
+    <p class="intro-label"></p>
+  </div>
 
-      if (mainHeader) {
-        mainHeader.classList.toggle('theme-pink', isPink);
-        mainHeader.classList.toggle('theme-black', !isPink);
-      }
-      if (btnWear) btnWear.classList.toggle('active', isPink);
-      if (btnSuplementos) btnSuplementos.classList.toggle('active', !isPink);
-      if (bgPink) {
-        const pinkOpacity = firstSectionIsPink ? 1 - scrollProg : scrollProg;
-        bgPink.style.opacity = clamp(pinkOpacity * 1.5, 0, 1);
-      }
-    }
-
-    window.addEventListener('scroll', syncScroll, { passive: true });
-    window.addEventListener('resize', syncScroll, { passive: true });
-    window.addEventListener('DOMContentLoaded', syncScroll);
-    syncScroll();
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetEl = document.getElementById(btn.getAttribute('data-target'));
-        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
-
-    const counterEl = document.getElementById('client-counter');
-    if (counterEl) {
-      let animated = false;
-      const counterIo = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !animated) {
-          animated = true;
-          let start = 0;
-          const target = 2500;
-          const duration = 2000;
-          const increment = target / (duration / 16);
-          const timer = setInterval(() => {
-            start += increment;
-            if (start >= target) {
-              clearInterval(timer);
-              counterEl.textContent = target.toLocaleString('pt-BR');
-            } else {
-              counterEl.textContent = Math.floor(start).toLocaleString('pt-BR');
-            }
-          }, 16);
-        }
-      });
-      counterIo.observe(counterEl);
-    }
-  </script>
+  <script src="assets/js/app.js" defer></script>
 </body>
 
 </html>
