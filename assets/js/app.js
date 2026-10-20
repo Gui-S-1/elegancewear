@@ -96,6 +96,7 @@
     hb: 120,        // meia-altura da faixa ASCII
     ampNow: 0,      // amplitude total da onda no quadro atual
     wrapTop: [0, 0],
+    fr: { n: 0, sum: 0 }, // quadros da maré atual (para medir lentidão)
   };
 
   /* =========================================================================
@@ -104,7 +105,7 @@
   const A = { canvas: document.createElement('canvas'), cw: 6, ch: 12, gw: 6, gh: 12 };
 
   function buildAtlas() {
-    const size = S.W < 700 ? 10 : 12;
+    const size = S.W < 700 ? (LITE.on ? 13 : 10) : (LITE.on ? 14 : 12);
     const m = A.canvas.getContext('2d');
     m.font = `600 ${size}px ${MONO}`;
     A.cw = Math.max(5, Math.round(m.measureText('M').width));
@@ -247,7 +248,8 @@ void main() {
   gl_FragColor = vec4(col * a, a);
 }`;
 
-  const FL = { list: [], raf: 0, last: 0 };
+  // clock só anda quando a névoa está animando, então congelar/voltar não dá salto
+  const FL = { list: [], raf: 0, prev: 0, acc: 0, clock: 0 };
 
   function createFluid(canvas, cfg) {
     let gl = null;
@@ -290,8 +292,8 @@ void main() {
     f.resize = (W, H) => {
       f.w = W;
       f.h = H;
-      canvas.width = Math.max(32, Math.round(W / 4));
-      canvas.height = Math.max(32, Math.round(H / 4));
+      canvas.width = Math.max(32, Math.round(W / 5));
+      canvas.height = Math.max(32, Math.round(H / 5));
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     f.draw = time => {
@@ -329,25 +331,83 @@ void main() {
       if (!f) return;
       f.resize(S.W, S.H);
       f.sub = fluidSubject(w);
-      f.draw(performance.now() / 1000);
+      f.draw(FL.clock);
     });
   }
 
+  const drawAllFluids = () => FL.list.forEach(f => f && f.draw(FL.clock));
+
+  // ~20 fps só no mundo visível; parada durante a maré (o foco é a transição)
   function fluidTick(now) {
     FL.raf = 0;
-    if (document.hidden || reduce) return;
-    if (now - FL.last >= 32) {
-      FL.last = now;
-      const both = S.moving || (S.p > 0 && S.p < 1);
-      FL.list.forEach((f, w) => {
-        if (f && (both || w === S.settled)) f.draw(now / 1000);
-      });
+    if (document.hidden || reduce || LITE.on) {
+      FL.prev = 0;
+      return;
+    }
+    const d = FL.prev ? Math.min(100, now - FL.prev) : 0;
+    FL.prev = now;
+    if (!S.moving) {
+      FL.clock += d / 1000;
+      FL.acc += d;
+      if (FL.acc >= 50) {
+        FL.acc = 0;
+        const f = FL.list[S.settled];
+        if (f) f.draw(FL.clock);
+      }
     }
     FL.raf = requestAnimationFrame(fluidTick);
   }
 
   function startFluid() {
-    if (!FL.raf && !reduce && FL.list.some(Boolean)) FL.raf = requestAnimationFrame(fluidTick);
+    if (!FL.raf && !reduce && !LITE.on && FL.list.some(Boolean)) FL.raf = requestAnimationFrame(fluidTick);
+  }
+
+  /* =========================================================================
+     Modo leve: celular fraco ou em economia de bateria. Liga sozinho se o
+     aparelho declarar pouca memória ou se os quadros ficarem lentos.
+     (?lite=1 / ?lite=0 forçam, para testar)
+     ========================================================================= */
+  const LITE = { on: false, forced: null };
+  {
+    const m = /[?&]lite=([01])/.exec(location.search);
+    if (m) LITE.forced = m[1] === '1';
+  }
+
+  function setLite(on) {
+    if (LITE.forced !== null) on = LITE.forced;
+    if (LITE.on === on) return;
+    LITE.on = on;
+    root.classList.toggle('lite', on);
+    layerState = '';
+    if (S.W) measure();
+    if (on) drawAllFluids(); // a névoa vira um quadro parado
+    else startFluid();
+  }
+
+  function deviceLooksWeak() {
+    const mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency;
+    const save = navigator.connection && navigator.connection.saveData;
+    return !!save || (mem && mem <= 3) || (cores && cores <= 2);
+  }
+
+  // mede ~100 quadros depois que o site aparece; se muitos passarem de 25 ms, alivia
+  function probeFps() {
+    if (LITE.on || reduce || LITE.forced !== null) return;
+    let n = 0, slow = 0, last = 0;
+    const step = now => {
+      if (LITE.on) return;
+      if (last) {
+        const d = now - last;
+        if (d < 250) {
+          n++;
+          if (d > 25) slow++;
+        }
+      }
+      last = now;
+      if (n < 100) requestAnimationFrame(step);
+      else if (slow / n > 0.35) setLite(true);
+    };
+    requestAnimationFrame(step);
   }
 
   /* =========================================================================
@@ -399,7 +459,7 @@ void main() {
       layerState = 'tide';
     }
     // o segundo mundo é recortado pela superfície (abaixo dela = ele)
-    const step = Math.max(1, Math.round(n / 64));
+    const step = Math.max(1, Math.round(n / (LITE.on ? 20 : 40)));
     let pts = `0px ${F.ys[0].toFixed(1)}px`;
     for (let c = 0; c < n; c += step) pts += `,${(c * cw + cw / 2).toFixed(1)}px ${F.ys[c].toFixed(1)}px`;
     pts += `,${W}px ${F.ys[n - 1].toFixed(1)}px,${W}px ${H + 2}px,0px ${H + 2}px`;
@@ -408,6 +468,8 @@ void main() {
     w1.style.webkitClipPath = clip;
 
     // as fotos se apagam perto da superfície; ali quem desenha é o ASCII
+    // (no modo leve pula: repintar as fotos com máscara a cada quadro pesa)
+    if (LITE.on) return;
     const A0 = S.ampNow + 6;
     const bEnd = F.yc - A0 - S.wrapTop[0];
     const bStart = bEnd - S.hb * 0.8;
@@ -472,7 +534,7 @@ void main() {
         const L = (below ? L1 : L0)[r * cols + c];
         const env = 1 - smooth(0.45, 1, ad);
 
-        if (ad < FOAM_Z) {
+        if (ad < FOAM_Z && !LITE.on) {
           // espuma: caracteres soltos cintilando na superfície
           const foam = 1 - ad / FOAM_Z;
           const h = hash(c, r, tick);
@@ -500,6 +562,16 @@ void main() {
       for (let c = 0; c < cols; c++) ctx.lineTo(c * cw + cw / 2, F.ys[c]);
       ctx.lineTo(W + 4, F.ys[cols - 1]);
     };
+
+    if (LITE.on) {
+      ctx.globalAlpha = 0.8;
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#fff';
+      surface();
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      return;
+    }
 
     // profundidade logo abaixo da superfície, na cor do líquido que sobe
     const liquid = look(1).tint;
@@ -546,7 +618,7 @@ void main() {
   const bubbles = [];
 
   function updateBubbles(dt) {
-    if (S.moving && S.p > 0 && S.p < 1 && F.energy > 0.08 && bubbles.length < 14 && Math.random() < F.energy * 0.3) {
+    if (!LITE.on && S.moving && S.p > 0 && S.p < 1 && F.energy > 0.08 && bubbles.length < 14 && Math.random() < F.energy * 0.3) {
       const x = Math.random() * S.W;
       bubbles.push({
         x,
@@ -594,7 +666,7 @@ void main() {
 
   function scheduleScan(delay = 9000) {
     clearTimeout(scanTimer);
-    if (reduce) return;
+    if (reduce || LITE.on) return;
     scanTimer = setTimeout(() => {
       if (document.hidden || S.moving || INTRO.blocking) return scheduleScan(4000);
       sampleOwners();
@@ -815,6 +887,10 @@ void main() {
     S.time += dt;
     const prev = S.p;
     stepAnim(now, dt);
+    if (S.moving) {
+      S.fr.n++;
+      S.fr.sum += dt;
+    }
     S.vel = lerp(S.vel, (S.p - prev) / dt, 0.3);
     render(now, dt);
     if (S.anim || S.drag || S.moving || bubbles.length || scan.t >= 0 || INTRO.active) kick();
@@ -874,8 +950,10 @@ void main() {
     });
     scan.t = -1;
     clearTimeout(scanTimer);
+    S.fr = { n: 0, sum: 0 };
     measureItems();
     sampleOwners();
+    drawAllFluids(); // deixa os dois fundos atualizados antes de congelar
   }
 
   function applyWorldMeta(w) {
@@ -894,6 +972,9 @@ void main() {
       panel.style.visibility = i === w ? 'visible' : 'hidden';
     });
     el.switchBtns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.go === w)));
+    // maré abaixo de ~33 fps: próximas trocas no modo leve
+    if (S.fr.n > 20 && S.fr.sum / S.fr.n > 0.03) setLite(true);
+    S.fr = { n: 0, sum: 0 };
     if (w !== S.settled) {
       S.settled = w;
       applyWorldMeta(w);
@@ -1083,6 +1164,7 @@ void main() {
     render(INTRO.t0, 1 / 60);
     root.classList.add('ready');
     kick();
+    setTimeout(probeFps, 1500);
   }
 
   async function runIntro(w) {
@@ -1243,7 +1325,7 @@ void main() {
   function measure() {
     S.W = innerWidth;
     S.H = innerHeight;
-    S.dpr = Math.min(2, devicePixelRatio || 1);
+    S.dpr = LITE.on ? 1 : Math.min(2, devicePixelRatio || 1);
     el.canvas.width = Math.round(S.W * S.dpr);
     el.canvas.height = Math.round(S.H * S.dpr);
     S.hb = clamp(S.H * 0.11, 60, 110);
@@ -1269,6 +1351,8 @@ void main() {
     });
     el.switchBtns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.go === start)));
 
+    if (LITE.forced !== null) setLite(LITE.forced);
+    else if (deviceLooksWeak()) setLite(true);
     $$('.title').forEach(splitWords);
     collectItems();
     measure();
@@ -1319,6 +1403,7 @@ void main() {
           kick();
         },
         fluid: () => FL.list.map(Boolean),
+        lite: on => setLite(on),
         // avança quadros manualmente (útil quando a aba está em segundo plano)
         flush(ms = 3000) {
           const t0 = performance.now();
@@ -1327,7 +1412,8 @@ void main() {
             raf = 0;
             frame(t0 + t);
           }
-          FL.list.forEach(f => f && f.draw((t0 + ms) / 1000));
+          FL.clock += ms / 1000;
+          drawAllFluids();
         },
         // custo médio (ms) de um quadro da maré
         bench(n = 120) {
