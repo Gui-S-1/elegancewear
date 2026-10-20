@@ -1101,16 +1101,21 @@ void main() {
     INTRO.blocking = true;
     el.intro.dataset.world = keyOf(w);
     el.intro.classList.add('is-on');
-    await Promise.race([
-      Promise.all([src.decode().catch(() => {}), document.fonts ? document.fonts.load(`600 12px ${MONO}`).catch(() => {}) : 0]),
-      new Promise(r => setTimeout(r, 900)),
-    ]);
-    await asciiIntro(src, w);
-    el.intro.classList.add('is-out');
-    INTRO.blocking = false;
-    startReveal(w);
-    setTimeout(() => el.intro.remove(), 900);
-    scheduleScan(3500);
+    try {
+      await Promise.race([
+        Promise.all([src.decode().catch(() => {}), document.fonts ? document.fonts.load(`600 12px ${MONO}`).catch(() => {}) : 0]),
+        new Promise(r => setTimeout(r, 900)),
+      ]);
+      await asciiIntro(src, w);
+    } catch (e) {
+      /* a intro é só enfeite: se algo falhar, o site aparece mesmo assim */
+    } finally {
+      el.intro.classList.add('is-out');
+      INTRO.blocking = false;
+      startReveal(w);
+      setTimeout(() => el.intro.remove(), 900);
+      scheduleScan(3500);
+    }
   }
 
   function asciiIntro(src, w) {
@@ -1119,7 +1124,7 @@ void main() {
       const label = $('.intro-label', el.intro);
       const c = cv.getContext('2d');
       const dpr = Math.min(2, devicePixelRatio || 1);
-      const aspect = (src.naturalWidth || 1) / (src.naturalHeight || 1);
+      const aspect = (src.naturalWidth || +src.getAttribute('width') || 1) / (src.naturalHeight || +src.getAttribute('height') || 1);
       const wide = aspect > 1.6;
       const usePixel = src.dataset.intro === 'pixel';
       const tint = look(w).tint;
@@ -1129,6 +1134,8 @@ void main() {
       const cellH = cell / 0.62;
       const rows = Math.max(1, Math.round(cssW / aspect / cellH));
       const cssH = rows * cellH;
+      // aba aberta em segundo plano / webview ainda sem tamanho: pula a intro
+      if (!(cssW > 40) || !Number.isFinite(rows)) return resolve();
       cv.style.width = `${cssW}px`;
       cv.style.height = `${cssH}px`;
       cv.width = Math.round(cssW * dpr);
@@ -1182,6 +1189,7 @@ void main() {
       };
       addEventListener('pointerdown', finish);
       addEventListener('keydown', finish);
+      setTimeout(finish, HOLD + 1500);
 
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
       c.font = `600 ${(cellH * 0.86).toFixed(2)}px ${MONO}`;
