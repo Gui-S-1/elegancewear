@@ -54,19 +54,19 @@
   const RAMP = ' .:-=+*#%@';
   const FOAM = '01<>/\\|{}[]~^+*';
   const GLYPHS = RAMP + FOAM;
-  const PAL = ['#ecc98a', '#ffb3ca', '#ffffff']; // ouro, rosa, espuma
-  const PAL_GOLD = 0, PAL_ROSE = 1, PAL_FOAM = 2;
+  const PAL = ['#e4e4ea', '#ffb3ca', '#ffffff']; // prata, rosa, espuma
+  const PAL_MONO = 0, PAL_ROSE = 1, PAL_FOAM = 2;
   const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 
   /* ---------- identidade de cada mundo (data-key no HTML) ---------- */
   const LOOK = {
     black: {
-      pal: PAL_GOLD,
+      pal: PAL_MONO,
       base: '5,5,6',
       theme: '#050506',
-      tint: '241,212,155',
+      tint: '232,232,238',
       // fluido: cor do corpo, da fita, do brilho, intensidade
-      fluid: [[0.2, 0.12, 0.03], [0.82, 0.62, 0.3], [1, 0.9, 0.72], 0.5],
+      fluid: [[0.14, 0.14, 0.16], [0.72, 0.72, 0.78], [1, 1, 1], 0.36],
     },
     pink: {
       pal: PAL_ROSE,
@@ -363,9 +363,9 @@ void main() {
     F.yc = lerp(S.H + edge, -edge, p);
     const e = Math.sin(Math.PI * clamp(p, 0, 1));
     F.energy = e;
-    const a1 = 3 + 17 * e, a2 = 1.5 + 8 * e;
-    const tilt = clamp(-S.vel * 12, -16, 16) * e;
-    const bulge = S.drag ? 30 * e : 0;
+    const a1 = 2 + 8 * e, a2 = 1 + 3.5 * e;
+    const tilt = clamp(-S.vel * 6, -8, 8) * e;
+    const bulge = S.drag ? 14 * e : 0;
     const bx = S.drag ? S.drag.x : 0;
     const t = S.time;
     S.ampNow = a1 + a2 + Math.abs(tilt) + bulge;
@@ -456,7 +456,7 @@ void main() {
     if (L0.length !== cols * rows) return;
     const pal0 = look(0).pal, pal1 = look(1).pal;
     const tick = (S.time * 16) | 0;
-    const FOAM_Z = 0.24;
+    const FOAM_Z = 0.18;
     const nRamp = RAMP.length - 1;
 
     for (let c = 0; c < cols; c++) {
@@ -476,9 +476,9 @@ void main() {
           // espuma: caracteres soltos cintilando na superfície
           const foam = 1 - ad / FOAM_Z;
           const h = hash(c, r, tick);
-          if (h < foam * 0.55 * (0.4 + 0.6 * F.energy)) {
+          if (h < foam * 0.28 * (0.4 + 0.6 * F.energy)) {
             const g = RAMP.length + (((h * 9973) | 0) % FOAM.length);
-            glyph(g, PAL_FOAM, x, y, (0.25 + 0.7 * foam) * (0.45 + 0.55 * hash(r, c, tick + 3)));
+            glyph(g, PAL_FOAM, x, y, (0.2 + 0.5 * foam) * (0.45 + 0.55 * hash(r, c, tick + 3)));
             continue;
           }
         }
@@ -487,7 +487,7 @@ void main() {
           continue;
         }
         const g = Math.min(nRamp, 1 + ((L * nRamp) | 0));
-        glyph(g, below ? pal1 : pal0, x, y, env * (0.3 + 0.7 * L));
+        glyph(g, below ? pal1 : pal0, x, y, env * (0.25 + 0.6 * L));
       }
     }
     ctx.globalAlpha = 1;
@@ -508,33 +508,33 @@ void main() {
     ctx.lineTo(-4, S.H + 4);
     ctx.closePath();
     const depth = ctx.createLinearGradient(0, F.yc - S.ampNow, 0, F.yc + S.ampNow + 70);
-    depth.addColorStop(0, `rgba(${liquid},.22)`);
+    depth.addColorStop(0, `rgba(${liquid},.12)`);
     depth.addColorStop(1, `rgba(${liquid},0)`);
     ctx.fillStyle = depth;
     ctx.fill();
 
     const tint = ctx.createLinearGradient(0, 0, W, 0);
-    tint.addColorStop(0, 'rgb(241,212,155)');
-    tint.addColorStop(0.5, 'rgb(255,245,250)');
-    tint.addColorStop(1, 'rgb(255,140,185)');
+    tint.addColorStop(0, `rgb(${look(0).tint})`);
+    tint.addColorStop(0.5, 'rgb(255,250,252)');
+    tint.addColorStop(1, `rgb(${look(1).tint})`);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     ctx.strokeStyle = tint;
-    [[34, 0.05], [16, 0.1], [6, 0.24]].forEach(([w, a]) => {
+    [[18, 0.04], [8, 0.08], [3, 0.18]].forEach(([w, a]) => {
       ctx.globalAlpha = a;
       ctx.lineWidth = w;
       surface();
       ctx.stroke();
     });
-    ctx.globalAlpha = 0.95;
-    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = 0.85;
+    ctx.lineWidth = 1.2;
     ctx.strokeStyle = '#fff';
     surface();
     ctx.stroke();
     // reflexo especular logo acima
     ctx.save();
     ctx.translate(0, -3.5);
-    ctx.globalAlpha = 0.3;
+    ctx.globalAlpha = 0.18;
     ctx.lineWidth = 1;
     surface();
     ctx.stroke();
@@ -546,12 +546,12 @@ void main() {
   const bubbles = [];
 
   function updateBubbles(dt) {
-    if (S.moving && S.p > 0 && S.p < 1 && F.energy > 0.08 && bubbles.length < 46 && Math.random() < F.energy) {
+    if (S.moving && S.p > 0 && S.p < 1 && F.energy > 0.08 && bubbles.length < 14 && Math.random() < F.energy * 0.3) {
       const x = Math.random() * S.W;
       bubbles.push({
         x,
         y: frontAt(x) + 18 + Math.random() * S.hb,
-        r: 1 + Math.random() * 3.4,
+        r: 0.8 + Math.random() * 2,
         vy: 50 + Math.random() * 110,
         wob: Math.random() * 6.28,
         life: 1,
@@ -575,7 +575,7 @@ void main() {
     ctx.strokeStyle = `rgb(${look(1).tint})`;
     ctx.fillStyle = '#fff';
     for (const b of bubbles) {
-      const a = 0.6 * b.life * (1 - b.pop);
+      const a = 0.45 * b.life * (1 - b.pop);
       if (a <= 0) continue;
       const r = b.r * (1 + b.pop * 1.4);
       ctx.globalAlpha = a;
@@ -912,7 +912,7 @@ void main() {
     if (!S.moving && S.p === to) return;
     beginMotion();
     const dist = Math.abs(to - S.p);
-    S.anim = { type: 'tween', from: S.p, to, t0: performance.now(), dur: (reduce ? 420 : 1500) * Math.max(0.45, dist) };
+    S.anim = { type: 'tween', from: S.p, to, t0: performance.now(), dur: (reduce ? 420 : 1250) * Math.max(0.45, dist) };
     kick();
   }
 
@@ -1238,7 +1238,7 @@ void main() {
     S.dpr = Math.min(2, devicePixelRatio || 1);
     el.canvas.width = Math.round(S.W * S.dpr);
     el.canvas.height = Math.round(S.H * S.dpr);
-    S.hb = clamp(S.H * 0.17, 90, 170);
+    S.hb = clamp(S.H * 0.11, 60, 110);
     buildAtlas();
     if (S.moving) {
       measureItems();
