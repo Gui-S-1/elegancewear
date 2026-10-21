@@ -363,8 +363,9 @@ void main() {
   }
 
   /* =========================================================================
-     Modo leve: celular fraco ou em economia de bateria. Liga sozinho se o
-     aparelho declarar pouca memória ou se os quadros ficarem lentos.
+     Modo leve: sempre no celular (tela de toque) e em qualquer aparelho que
+     declare pouca memória, economia de dados ou fique com quadros lentos.
+     O efeito completo fica para computador.
      (?lite=1 / ?lite=0 forçam, para testar)
      ========================================================================= */
   const LITE = { on: false, forced: null };
@@ -384,10 +385,11 @@ void main() {
     else startFluid();
   }
 
-  function deviceLooksWeak() {
+  function preferLite() {
+    const phone = matchMedia('(hover: none) and (pointer: coarse)').matches;
     const mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency;
     const save = navigator.connection && navigator.connection.saveData;
-    return !!save || (mem && mem <= 3) || (cores && cores <= 2);
+    return phone || !!save || (mem && mem <= 3) || (cores && cores <= 2);
   }
 
   // mede ~100 quadros depois que o site aparece; se muitos passarem de 25 ms, alivia
@@ -1211,7 +1213,7 @@ void main() {
       const usePixel = src.dataset.intro === 'pixel';
       const tint = look(w).tint;
       const cssW = wide ? Math.min(innerWidth * 0.86, 460) : Math.min(innerWidth * 0.64, 270);
-      const cols = wide ? 92 : 44;
+      const cols = wide ? (innerWidth < 700 ? 64 : 92) : (innerWidth < 700 ? 36 : 44);
       const cell = cssW / cols;
       const cellH = cell / 0.62;
       const rows = Math.max(1, Math.round(cssW / aspect / cellH));
@@ -1352,7 +1354,7 @@ void main() {
     el.switchBtns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.go === start)));
 
     if (LITE.forced !== null) setLite(LITE.forced);
-    else if (deviceLooksWeak()) setLite(true);
+    else if (preferLite()) setLite(true);
     $$('.title').forEach(splitWords);
     collectItems();
     measure();
