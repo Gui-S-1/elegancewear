@@ -25,6 +25,7 @@
   };
   const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const easeTide = t => 1 - Math.pow(1 - t, 2.4); // sai rápido, chega suave
   const hash = (a, b, c) => {
     let h = Math.imul(a, 374761393) + Math.imul(b, 668265263) + Math.imul(c, 1274126177);
     h = Math.imul(h ^ (h >>> 13), 1103515245);
@@ -38,6 +39,7 @@
   const worlds = $$('.world');
   const el = {
     worlds,
+    inners: worlds.map(w => $('.world-inner', w)),
     wraps: worlds.map(w => $('.owner-wrap', w)),
     owners: worlds.map(w => $('.owner', w)),
     panels: $$('.panel'),
@@ -94,6 +96,7 @@
     anim: null, drag: null, moving: false,
     time: 0, last: 0,
     hb: 120,        // meia-altura da faixa ASCII
+    hbNow: 120,     // idem no quadro atual (encolhe nas pontas)
     ampNow: 0,      // amplitude total da onda no quadro atual
     wrapTop: [0, 0],
     fr: { n: 0, sum: 0 }, // quadros da maré atual (para medir lentidão)
@@ -421,16 +424,22 @@ void main() {
     const n = G.cols;
     if (F.ys.length !== n) F.ys = new Float32Array(n);
     const W = S.W, p = S.p;
-    const edge = S.hb + 14;
-    F.yc = lerp(S.H + edge, -edge, p);
+    // a faixa ASCII nasce do zero nas pontas: a superfície entra na tela já
+    // no primeiro pixel de arrasto (antes havia ~100 px de "zona morta")
+    S.hbNow = Math.max(8, S.hb * Math.min(1, p / 0.16, (1 - p) / 0.16));
     const e = Math.sin(Math.PI * clamp(p, 0, 1));
     F.energy = e;
-    const a1 = 2 + 8 * e, a2 = 1 + 3.5 * e;
-    const tilt = clamp(-S.vel * 6, -8, 8) * e;
-    const bulge = S.drag ? 14 * e : 0;
+    // no modo leve a superfície é reta: o mundo de baixo sobe por transform
+    // (GPU), sem recortar e repintar a tela inteira a cada quadro
+    const flat = LITE.on;
+    const a1 = flat ? 0 : 2 + 8 * e, a2 = flat ? 0 : 1 + 3.5 * e;
+    const tilt = flat ? 0 : clamp(-S.vel * 6, -8, 8) * e;
+    const bulge = !flat && S.drag ? 14 * e : 0;
     const bx = S.drag ? S.drag.x : 0;
     const t = S.time;
     S.ampNow = a1 + a2 + Math.abs(tilt) + bulge;
+    const edge = S.ampNow + 4;
+    F.yc = lerp(S.H + edge, -edge, p);
     for (let c = 0; c < n; c++) {
       const x = c * A.cw + A.cw * 0.5;
       const u = x / W;
@@ -453,12 +462,24 @@ void main() {
 
   function applyTideLayers() {
     const [w0, w1] = el.worlds;
+    const inner = el.inners[1];
     const W = S.W, H = S.H, cw = A.cw, n = F.ys.length;
-    if (layerState !== 'tide') {
+    const slide = LITE.on && !!inner;
+    const mode = slide ? 'tide-slide' : 'tide';
+    if (layerState !== mode) {
       w0.style.visibility = 'visible';
       w1.style.visibility = 'visible';
       w1.style.opacity = '';
-      layerState = 'tide';
+      clearTideStyles();
+      layerState = mode;
+    }
+    if (slide) {
+      // a caixa do mundo desce até a superfície e o conteúdo sobe o mesmo
+      // tanto: só aparece a parte abaixo da linha, e nada é repintado
+      const y = Math.round(F.yc);
+      w1.style.transform = `translate3d(0,${y}px,0)`;
+      inner.style.transform = `translate3d(0,${-y}px,0)`;
+      return;
     }
     // o segundo mundo é recortado pela superfície (abaixo dela = ele)
     const step = Math.max(1, Math.round(n / (LITE.on ? 20 : 40)));
@@ -474,10 +495,10 @@ void main() {
     if (LITE.on) return;
     const A0 = S.ampNow + 6;
     const bEnd = F.yc - A0 - S.wrapTop[0];
-    const bStart = bEnd - S.hb * 0.8;
+    const bStart = bEnd - S.hbNow * 0.8;
     const m0 = `linear-gradient(to bottom, #000 ${bStart.toFixed(1)}px, transparent ${bEnd.toFixed(1)}px)`;
     const pStart = F.yc + A0 - S.wrapTop[1];
-    const pEnd = pStart + S.hb * 0.8;
+    const pEnd = pStart + S.hbNow * 0.8;
     const m1 = `linear-gradient(to bottom, transparent ${pStart.toFixed(1)}px, #000 ${pEnd.toFixed(1)}px)`;
     el.wraps[0].style.webkitMaskImage = m0;
     el.wraps[0].style.maskImage = m0;
@@ -485,27 +506,33 @@ void main() {
     el.wraps[1].style.maskImage = m1;
   }
 
+  function clearTideStyles() {
+    const w1 = el.worlds[1];
+    w1.style.clipPath = '';
+    w1.style.webkitClipPath = '';
+    w1.style.transform = '';
+    if (el.inners[1]) el.inners[1].style.transform = '';
+    el.wraps.forEach(x => {
+      x.style.webkitMaskImage = '';
+      x.style.maskImage = '';
+    });
+  }
+
   function applyRestLayers(w) {
     const key = 'rest' + w;
     if (layerState === key) return;
     layerState = key;
     const [w0, w1] = el.worlds;
-    w1.style.clipPath = '';
-    w1.style.webkitClipPath = '';
+    clearTideStyles();
     w1.style.opacity = '';
-    el.wraps.forEach(x => {
-      x.style.webkitMaskImage = '';
-      x.style.maskImage = '';
-    });
     w0.style.visibility = w === 0 ? 'visible' : 'hidden';
     w1.style.visibility = w === 1 ? 'visible' : 'hidden';
   }
 
   function applyReducedLayers() {
+    if (layerState !== 'reduced') clearTideStyles();
     layerState = 'reduced';
     const [w0, w1] = el.worlds;
-    w1.style.clipPath = '';
-    w1.style.webkitClipPath = '';
     w0.style.visibility = S.p < 1 ? 'visible' : 'hidden';
     w1.style.visibility = S.p > 0 ? 'visible' : 'hidden';
     w1.style.opacity = S.p.toFixed(3);
@@ -515,7 +542,7 @@ void main() {
      Desenho da maré (canvas)
      ========================================================================= */
   function drawTide() {
-    const cols = F.ys.length, rows = G.rows, hb = S.hb, cw = A.cw, ch = A.ch;
+    const cols = F.ys.length, rows = G.rows, hb = S.hbNow, cw = A.cw, ch = A.ch;
     const L0 = G.lum[0], L1 = G.lum[1];
     if (L0.length !== cols * rows) return;
     const pal0 = look(0).pal, pal1 = look(1).pal;
@@ -756,7 +783,7 @@ void main() {
       else if (p >= 1) t = it.w ? 1 : 0;
       else {
         const f = frontAt(it.x);
-        const u = it.w ? (it.y - f) / S.hb : (f - it.y) / S.hb;
+        const u = it.w ? (it.y - f) / S.hbNow : (f - it.y) / S.hbNow;
         t = smooth(-0.2, 0.85, u);
       }
 
@@ -928,10 +955,10 @@ void main() {
     if (!a) return;
     if (a.type === 'tween') {
       const k = clamp((now - a.t0) / a.dur, 0, 1);
-      S.p = lerp(a.from, a.to, easeInOut(k));
+      S.p = lerp(a.from, a.to, easeTide(k));
       if (k >= 1) settle(a.to);
     } else {
-      const K = 64, C = 2 * Math.sqrt(K) * 0.94;
+      const K = 120, C = 2 * Math.sqrt(K) * 0.95;
       a.v += (K * (a.to - S.p) - C * a.v) * dt;
       S.p += a.v * dt;
       if (S.p <= 0 || S.p >= 1) {
@@ -986,6 +1013,7 @@ void main() {
       } catch (e) { /* file:// */ }
     }
     scheduleScan(6000);
+    updatePanLock();
     kick();
   }
 
@@ -995,7 +1023,7 @@ void main() {
     if (!S.moving && S.p === to) return;
     beginMotion();
     const dist = Math.abs(to - S.p);
-    S.anim = { type: 'tween', from: S.p, to, t0: performance.now(), dur: (reduce ? 420 : 1250) * Math.max(0.45, dist) };
+    S.anim = { type: 'tween', from: S.p, to, t0: performance.now(), dur: (reduce ? 420 : 950) * Math.max(0.5, dist) };
     kick();
   }
 
@@ -1011,7 +1039,7 @@ void main() {
 
   function dragMove(x, y) {
     const d = S.drag, now = performance.now();
-    S.p = clamp(d.p0 + (d.y0 - y) / (S.H * 0.72), 0, 1);
+    S.p = clamp(d.p0 + (d.y0 - y) / (S.H * 0.9), 0, 1);
     d.x = x;
     d.samples.push([now, S.p]);
     while (d.samples.length > 2 && now - d.samples[0][0] > 110) d.samples.shift();
@@ -1025,14 +1053,21 @@ void main() {
     const dtS = (performance.now() - t0) / 1000;
     const v = dtS > 0.008 ? (S.p - p0) / dtS : 0;
     let to = S.p > 0.5 ? 1 : 0;
-    if (Math.abs(v) > 0.45) to = v > 0 ? 1 : 0;
+    if (Math.abs(v) > 0.3) to = v > 0 ? 1 : 0;
     if (reduce) return go(to);
-    S.anim = { type: 'spring', to, v: clamp(v, -6, 6) };
+    S.anim = { type: 'spring', to, v: clamp(v, -8, 8) };
     kick();
   }
 
   // O painel só conta como rolável se sobrar conteúdo de verdade
   // (ignora os poucos px que as animações de entrada empurram para fora).
+  // painel cabe na tela: touch-action none (o navegador não espera para
+  // decidir se é rolagem, e o toque chega direto na maré)
+  function updatePanLock() {
+    const pan = el.panels[S.settled];
+    root.classList.toggle('pan-lock', pan.scrollHeight - pan.clientHeight <= 24);
+  }
+
   function panelScroll() {
     const pan = el.panels[S.settled];
     const room = pan.scrollHeight - pan.clientHeight;
@@ -1339,6 +1374,7 @@ void main() {
     F.ys = new Float32Array(0);
     if (S.moving) computeFront();
     sizeFluid();
+    if (el.panels.length) updatePanLock();
     kick();
   }
 
